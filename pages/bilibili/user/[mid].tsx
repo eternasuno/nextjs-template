@@ -44,7 +44,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
                 url: `https://www.bilibili.com/video/${video.bvid}`,
                 guid: video.bvid,
                 author: video.author,
-                date: new Date(video.created),
+                date: new Date(video.created * 1000),
                 enclosure: {
                     url: `https://${host}/api/bilibili/video/${video.bvid}`,
                     type: "audio/mp3",
@@ -62,7 +62,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
                 url: `https://www.bilibili.com/audio/au${audio.id}`,
                 guid: `au${audio.id}`,
                 author: audio.uname,
-                date: new Date(audio.passtime),
+                date: new Date(audio.passtime * 1000),
                 enclosure: {
                     url: `https://${host}/api/bilibili/audio/${audio.id}`,
                     type: "audio/mpeg",
