@@ -35,7 +35,7 @@ export const getUserVideoList = async (mid: string) => {
         list: { vlist },
     } = await get(url.toString());
 
-    return vlist as any[];
+    return (vlist as any[]) || [];
 };
 
 export const getUserAudioList = async (uid: string) => {
@@ -49,5 +49,5 @@ export const getUserAudioList = async (uid: string) => {
 
     const { data } = await get(url.toString());
 
-    return data as any[];
+    return (data as any[]) || [];
 };
