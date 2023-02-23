@@ -53,7 +53,11 @@ const handle = async (request: NextRequest) => {
     try {
         const { cid } = await getInfo(bvid);
         const path = await getAudioPath(bvid, cid);
-        return new Response(JSON.stringify({ path }));
+        return fetch(path, {
+            headers: {
+                referer: "https://www.bilibili.com",
+            },
+        });
     } catch (error: any) {
         const message = error.message;
         return new Response(JSON.stringify({ message }), {
