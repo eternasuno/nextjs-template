@@ -42,7 +42,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
                 date: new Date(video.created),
                 enclosure: {
                     url: `https://${host}/api/audio/bilibili/${video.bvid}`,
-                    type: "audio/x-m4s",
+                    type: "audio/mp3",
                 },
                 itunesAuthor: video.author,
                 itunesDuration: convertDuration(video.length),

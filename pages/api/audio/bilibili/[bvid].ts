@@ -50,11 +50,14 @@ const handle = async (request: NextRequest) => {
     try {
         const { cid } = await getInfo(bvid);
         const path = await getAudioPath(bvid, cid);
-        return fetch(path, {
+
+        const response = await fetch(path, {
             headers: {
                 Referer: "https://www.bilibili.com",
-                Accept: "audio/x-m4s",
             },
+        });
+        return new Response(response.body, {
+            headers: { "Content-Type": "audio/mp3" },
         });
     } catch (error: any) {
         const message = error.message;
