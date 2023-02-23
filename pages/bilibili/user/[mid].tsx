@@ -1,4 +1,8 @@
-import { getUserInfo, getUserVideoList } from "@/lib/bilibili";
+import {
+    getUserAudioList,
+    getUserInfo,
+    getUserVideoList,
+} from "@/lib/bilibili";
 import { GetServerSideProps } from "next";
 import { FeedOptions, Item, Podcast } from "podcast";
 
@@ -14,9 +18,10 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     const mid = req.url?.split("/").at(-1)!;
 
     try {
-        const [user, videoList] = await Promise.all([
+        const [user, videoList, audioList] = await Promise.all([
             getUserInfo(mid),
             getUserVideoList(mid),
+            getUserAudioList(mid),
         ]);
 
         const feedOptions = {
@@ -32,7 +37,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
             },
         } as FeedOptions;
 
-        const items = videoList.map((video: any) => {
+        const videoItems = videoList.map((video: any) => {
             return {
                 title: video.title,
                 description: video.description,
@@ -41,7 +46,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
                 author: video.author,
                 date: new Date(video.created),
                 enclosure: {
-                    url: `https://${host}/api/audio/bilibili/${video.bvid}`,
+                    url: `https://${host}/api/bilibili/video/${video.bvid}`,
                     type: "audio/mp3",
                 },
                 itunesAuthor: video.author,
@@ -51,7 +56,28 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
             } as Item;
         });
 
-        const podcast = new Podcast(feedOptions, items);
+        const audioItems = audioList.map((audio: any) => {
+            return {
+                title: audio.title,
+                url: `https://www.bilibili.com/audio/au${audio.id}`,
+                guid: `au${audio.id}`,
+                author: audio.uname,
+                date: new Date(audio.passtime),
+                enclosure: {
+                    url: `https://${host}/api/bilibili/audio/${audio.id}`,
+                    type: "audio/x-m4a",
+                },
+                itunesAuthor: audio.uname,
+                itunesDuration: audio.duration,
+                itunesImage: audio.cover,
+                itunesTitle: audio.title,
+            } as Item;
+        });
+
+        const podcast = new Podcast(feedOptions, [
+            ...videoItems,
+            ...audioItems,
+        ]);
 
         res.setHeader("Content-Type", "text/xml");
         res.write(podcast.buildXml());

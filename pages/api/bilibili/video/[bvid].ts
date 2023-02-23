@@ -30,7 +30,7 @@ const getInfo = async (bvid: string) => {
     return await get(url.toString());
 };
 
-const getAudioPath = async (bvid: string, cid: string) => {
+const getVideoPath = async (bvid: string, cid: string) => {
     const url = new URL("https://api.bilibili.com/x/player/playurl");
     url.searchParams.append("bvid", bvid);
     url.searchParams.append("cid", cid);
@@ -49,7 +49,7 @@ const handle = async (request: NextRequest) => {
 
     try {
         const { cid } = await getInfo(bvid);
-        const path = await getAudioPath(bvid, cid);
+        const path = await getVideoPath(bvid, cid);
 
         const response = await fetch(path, {
             headers: {

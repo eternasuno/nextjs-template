@@ -37,3 +37,17 @@ export const getUserVideoList = async (mid: string) => {
 
     return vlist as any[];
 };
+
+export const getUserAudioList = async (uid: string) => {
+    const url = new URL(
+        "https://api.bilibili.com/audio/music-service/web/song/upper",
+    );
+    url.searchParams.append("uid", uid);
+    url.searchParams.append("pn", "1");
+    url.searchParams.append("ps", "5");
+    url.searchParams.append("order", "1");
+
+    const { data } = await get(url.toString());
+
+    return data as any[];
+};
