@@ -47,7 +47,7 @@ const handle = async (request: NextRequest) => {
             },
         });
         return new Response(response.body, {
-            headers: { "Content-Type": "audio/x-m4a" },
+            headers: { "Content-Type": "audio/*" },
         });
     } catch (error: any) {
         const message = error.message;
