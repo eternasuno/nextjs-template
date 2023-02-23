@@ -53,7 +53,7 @@ const handle = async (request: NextRequest) => {
         return fetch(path, {
             headers: {
                 Referer: "https://www.bilibili.com",
-                Accept: "audio/mp3",
+                Accept: "audio/x-m4s",
             },
         });
     } catch (error: any) {
