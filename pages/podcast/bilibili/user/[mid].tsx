@@ -36,10 +36,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
             return {
                 title: video.title,
                 description: video.description,
-                url: `https://${host}/api/audio/bilibili/${video.bvid}`,
+                url: `https://www.bilibili.com/video/${video.bvid}`,
                 guid: video.bvid,
                 author: video.author,
                 date: new Date(video.created),
+                enclosure: {
+                    url: `https://${host}/api/audio/bilibili/${video.bvid}`,
+                    type: "video/mp4",
+                },
                 itunesAuthor: video.author,
                 itunesDuration: convertDuration(video.length),
                 itunesImage: video.pic,

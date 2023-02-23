@@ -52,7 +52,8 @@ const handle = async (request: NextRequest) => {
         const path = await getAudioPath(bvid, cid);
         return fetch(path, {
             headers: {
-                referer: "https://www.bilibili.com",
+                Referer: "https://www.bilibili.com",
+                Accept: "audio/*",
             },
         });
     } catch (error: any) {
