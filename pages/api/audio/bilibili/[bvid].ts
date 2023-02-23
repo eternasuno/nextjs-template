@@ -4,21 +4,30 @@ export const config = {
     runtime: "edge",
 };
 
-const getInfo = async (bvid: string) => {
-    const url = new URL("https://api.bilibili.com/x/web-interface/view");
-    url.searchParams.append("bvid", bvid);
-
-    const response = await fetch(url);
+const get = async (url: string) => {
+    const response = await fetch(url, {
+        headers: {
+            "User-Agent":
+                "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15",
+        },
+    });
     if (!response.ok) {
         throw new Error(response.statusText);
     }
 
-    const { code, message, data } = await response.json();
+    const { code, message, data } = (await response.json()) as any;
     if (code !== 0) {
         throw new Error(message);
     }
 
     return data;
+};
+
+const getInfo = async (bvid: string) => {
+    const url = new URL("https://api.bilibili.com/x/web-interface/view");
+    url.searchParams.append("bvid", bvid);
+
+    return await get(url.toString());
 };
 
 const getAudioPath = async (bvid: string, cid: string) => {
@@ -27,21 +36,9 @@ const getAudioPath = async (bvid: string, cid: string) => {
     url.searchParams.append("cid", cid);
     url.searchParams.append("fnval", "16");
 
-    const response = await fetch(url);
-    if (!response.ok) {
-        throw new Error(response.statusText);
-    }
-
     const {
-        code,
-        message,
-        data: {
-            dash: { audio },
-        },
-    } = await response.json();
-    if (code !== 0) {
-        throw new Error(message);
-    }
+        dash: { audio },
+    } = await get(url.toString());
 
     return audio[0].baseUrl as string;
 };
