@@ -65,7 +65,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
                 date: new Date(audio.passtime),
                 enclosure: {
                     url: `https://${host}/api/bilibili/audio/${audio.id}`,
-                    type: "audio/x-m4a",
+                    type: "audio/mpeg",
                 },
                 itunesAuthor: audio.uname,
                 itunesDuration: audio.duration,
