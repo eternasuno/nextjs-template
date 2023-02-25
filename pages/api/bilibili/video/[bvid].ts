@@ -57,7 +57,10 @@ const handle = async (request: NextRequest) => {
             },
         });
         return new Response(response.body, {
-            headers: { "Content-Type": "audio/mp3" },
+            headers: {
+                ...response.headers,
+                "Content-Type": "audio/mp3",
+            },
         });
     } catch (error: any) {
         const message = error.message;
