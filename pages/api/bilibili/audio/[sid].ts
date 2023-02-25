@@ -41,27 +41,16 @@ const handle = async (request: NextRequest) => {
     try {
         const path = await getAudioPath(sid);
 
-        const response = await fetch(path, {
-            headers: {
-                Referer: "https://www.bilibili.com",
-            },
-        });
-
-        const contentLength = parseInt(
-            response.headers.get("content-length") || "0",
-        );
-
         const headers = new Headers();
-        headers.set("connection", "keep-alive");
-        headers.set("keep-alive", "timeout=5, max=1000");
-        headers.set("content-type", "audio/mpeg");
-        headers.set("content-length", String(contentLength));
-        headers.set(
-            "content-range",
-            `bytes 0-${contentLength}/${contentLength + 1}`,
-        );
+        headers.set("referer", "https://www.bilibili.com");
+        request.headers.has("range") &&
+            headers.set("range", request.headers.get("range")!);
 
-        return new NextResponse(response.body, { headers });
+        const response = await fetch(path, { headers });
+
+        response.headers.set("content-type", "audio/mpeg");
+
+        return response;
     } catch (error: any) {
         const message = error.message;
         return new NextResponse(JSON.stringify({ message }), {
