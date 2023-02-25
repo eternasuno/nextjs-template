@@ -57,7 +57,18 @@ const handle = async (request: NextRequest) => {
             headers.set("range", request.headers.get("range")!);
 
         const response = await fetch(path, { headers });
+
+        const contentLength = response.headers.has("content-length")
+            ? parseInt(response.headers.get("content-length")!)
+            : 0;
+        response.headers.set("connection", "keep-alive");
+        response.headers.set("keep-alive", "timeout=5, max=1000");
         response.headers.set("content-type", "audio/mp3");
+        headers.set(
+            "content-range",
+            `bytes 0-${contentLength}/${contentLength + 1}`,
+        );
+
         return response;
     } catch (error: any) {
         const message = error.message;
