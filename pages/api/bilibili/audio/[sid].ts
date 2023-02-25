@@ -1,10 +1,7 @@
-import { NextApiRequest, NextApiResponse } from "next";
-import fetch from "node-fetch";
+import { NextResponse, type NextRequest } from "next/server";
 
 export const config = {
-    api: {
-        responseLimit: false,
-    },
+    runtime: "edge",
 };
 
 const get = async (url: string) => {
@@ -37,14 +34,12 @@ const getAudioPath = async (sid: string) => {
     return cdns[0] as string;
 };
 
-const handle = async (req: NextApiRequest, res: NextApiResponse) => {
-    const { sid } = req.query;
-    if (!sid) {
-        return res.status(400).json({ message: "sid is empty!" });
-    }
+const handle = async (request: NextRequest) => {
+    const { searchParams } = new URL(request.url);
+    const sid = searchParams.get("sid")!;
 
     try {
-        const path = await getAudioPath(Array.isArray(sid) ? sid[0] : sid);
+        const path = await getAudioPath(sid);
 
         const response = await fetch(path, {
             headers: {
@@ -56,29 +51,23 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
             response.headers.get("content-length") || "0",
         );
 
-        res.setHeader("connection", "keep-alive");
-        res.setHeader("keep-alive", "timeout=5, max=1000");
-        res.setHeader("content-type", "audio/mpeg");
-        res.setHeader("accept-ranges", "bytes");
-        res.setHeader("content-length", contentLength);
+        const headers = new Headers();
+        headers.set("connection", "keep-alive");
+        headers.set("keep-alive", "timeout=5, max=1000");
+        headers.set("content-type", "audio/mpeg");
+        headers.set("content-length", String(contentLength));
+        headers.set(
+            "content-range",
+            `bytes 0-${contentLength}/${contentLength + 1}`,
+        );
 
-        if (req.headers.range) {
-            const [type, start, end] = req.headers.range.split(/=|-/);
-            const rangeLength = end
-                ? parseInt(end) - parseInt(start) + 1
-                : contentLength + 1;
-
-            res.setHeader(
-                "content-range",
-                `${type} ${start}-${end}/${rangeLength}`,
-            );
-
-            return res.status(206).send(response.body);
-        } else {
-            return res.status(200).send(response.body);
-        }
+        return new NextResponse(response.body, { headers });
     } catch (error: any) {
-        return res.status(500).json({ message: error.message });
+        const message = error.message;
+        return new NextResponse(JSON.stringify({ message }), {
+            status: 500,
+            statusText: "Internal Server Error",
+        });
     }
 };
 
