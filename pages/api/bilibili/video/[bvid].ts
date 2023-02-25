@@ -1,4 +1,4 @@
-import { type NextRequest } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 
 export const config = {
     runtime: "edge",
@@ -56,15 +56,25 @@ const handle = async (request: NextRequest) => {
                 Referer: "https://www.bilibili.com",
             },
         });
-        return new Response(response.body, {
-            headers: {
-                ...response.headers,
-                "Content-Type": "audio/mp3",
-            },
-        });
+
+        const contentLength = parseInt(
+            response.headers.get("content-length") || "0",
+        );
+
+        const headers = new Headers();
+        headers.set("connection", "keep-alive");
+        headers.set("keep-alive", "timeout=5, max=1000");
+        headers.set("content-type", "audio/mp3");
+        headers.set("content-length", String(contentLength));
+        headers.set(
+            "content-range",
+            `bytes 0-${contentLength}/${contentLength + 1}`,
+        );
+
+        return new NextResponse(response.body, { headers });
     } catch (error: any) {
         const message = error.message;
-        return new Response(JSON.stringify({ message }), {
+        return new NextResponse(JSON.stringify({ message }), {
             status: 500,
             statusText: "Internal Server Error",
         });
