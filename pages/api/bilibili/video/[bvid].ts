@@ -51,26 +51,34 @@ const handle = async (request: NextRequest) => {
         const { cid } = await getInfo(bvid);
         const path = await getVideoPath(bvid, cid);
 
-        const headers = new Headers();
-        headers.set("referer", "https://www.bilibili.com");
+        const requestHeaders = new Headers();
+        requestHeaders.set("referer", "https://www.bilibili.com");
         request.headers.has("range") &&
-            headers.set("range", request.headers.get("range")!);
+            requestHeaders.set("range", request.headers.get("range")!);
 
-        const response = await fetch(path, { headers });
+        const response = await fetch(path, { headers: requestHeaders });
 
         const contentLength = response.headers.has("content-length")
             ? parseInt(response.headers.get("content-length")!)
             : 0;
-        response.headers.set("connection", "keep-alive");
-        response.headers.set("keep-alive", "timeout=5, max=1000");
-        response.headers.set("content-type", "audio/mp3");
-        response.headers.has("content-range") ||
-            response.headers.set(
-                "content-range",
-                `bytes 0-${contentLength}/${contentLength + 1}`,
-            );
 
-        return response;
+        const responseHeaders = new Headers();
+        responseHeaders.set(
+            "content-range",
+            `bytes 0-${contentLength}/${contentLength + 1}`,
+        );
+        response.headers.forEach((value, key) => {
+            responseHeaders.set(key, value);
+        });
+        responseHeaders.set("connection", "keep-alive");
+        responseHeaders.set("keep-alive", "timeout=5, max=1000");
+        responseHeaders.set("content-type", "audio/mpeg");
+
+        return new NextResponse(response.body, {
+            status: response.status,
+            statusText: response.statusText,
+            headers: responseHeaders,
+        });
     } catch (error: any) {
         const message = error.message;
         return new NextResponse(JSON.stringify({ message }), {
