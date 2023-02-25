@@ -64,10 +64,11 @@ const handle = async (request: NextRequest) => {
         response.headers.set("connection", "keep-alive");
         response.headers.set("keep-alive", "timeout=5, max=1000");
         response.headers.set("content-type", "audio/mp3");
-        headers.set(
-            "content-range",
-            `bytes 0-${contentLength}/${contentLength + 1}`,
-        );
+        response.headers.has("content-range") ||
+            response.headers.set(
+                "content-range",
+                `bytes 0-${contentLength}/${contentLength + 1}`,
+            );
 
         return response;
     } catch (error: any) {
