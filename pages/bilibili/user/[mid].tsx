@@ -18,7 +18,6 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
             getUserVideoList(mid, 5),
             getUserAudioList(mid, 5),
         ]);
-        console.debug(user);
 
         const feedOptions = {
             title: user.name,

@@ -28,6 +28,7 @@ const handler = async (request: NextApiRequest, response: NextApiResponse) => {
 
         return response.status(res.status).send(res.body);
     } catch (error: any) {
+        console.warn(error);
         const message = error.message;
         return response.status(500).json({
             message,

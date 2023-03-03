@@ -26,7 +26,13 @@ const handler = async (request: NextApiRequest, response: NextApiResponse) => {
         response.setHeader("Content-Type", "audio/mpeg");
 
         return response.status(200).send(res.body);
-    } catch (error) {}
+    } catch (error: any) {
+        console.warn(error);
+        const message = error.message;
+        return response.status(500).json({
+            message,
+        });
+    }
 };
 
 export default handler;
