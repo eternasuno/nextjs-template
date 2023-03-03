@@ -18,6 +18,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
             getUserVideoList(mid, 5),
             getUserAudioList(mid, 5),
         ]);
+        console.debug(user);
 
         const feedOptions = {
             title: user.name,
@@ -78,6 +79,7 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
         res.write(podcast.buildXml());
         res.end();
     } catch (error: any) {
+        console.warn(error);
         res.statusCode = 500;
         res.statusMessage = error.message;
     }

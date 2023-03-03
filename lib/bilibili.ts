@@ -53,14 +53,16 @@ export const getUserVideoList = async (mid: string, limit: Number) => {
         list: { vlist },
     } = await get(url);
 
-    return (vlist as any[]).map((video) => {
-        const { created, length, ...rest } = video;
-        return {
-            ...rest,
-            created: new Date(created * 1000),
-            length: convertDuration(length),
-        } as Video;
-    });
+    return vlist
+        ? (vlist as any[]).map((video) => {
+              const { created, length, ...rest } = video;
+              return {
+                  ...rest,
+                  created: new Date(created * 1000),
+                  length: convertDuration(length),
+              } as Video;
+          })
+        : [];
 };
 
 export type Audio = {
@@ -84,13 +86,15 @@ export const getUserAudioList = async (uid: string, limit: Number) => {
 
     const { data } = await get(url);
 
-    return (data as any[]).map((audio) => {
-        const { passtime, ...rest } = audio;
-        return {
-            ...rest,
-            passtime: new Date(passtime * 1000),
-        };
-    });
+    return data
+        ? (data as any[]).map((audio) => {
+              const { passtime, ...rest } = audio;
+              return {
+                  ...rest,
+                  passtime: new Date(passtime * 1000),
+              };
+          })
+        : [];
 };
 
 export const getVideoPath = async (bvid: string) => {
