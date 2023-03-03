@@ -8,11 +8,6 @@ import { FeedOptions, Item, Podcast } from "podcast";
 
 const User = () => {};
 
-const convertDuration = (length: string) => {
-    const [minutes, seconds] = length.split(":");
-    return parseInt(minutes) * 60 + parseInt(seconds);
-};
-
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     const host = req.headers.host;
     const mid = req.url?.split("/").at(-1)!;
@@ -20,8 +15,8 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     try {
         const [user, videoList, audioList] = await Promise.all([
             getUserInfo(mid),
-            getUserVideoList(mid),
-            getUserAudioList(mid),
+            getUserVideoList(mid, 5),
+            getUserAudioList(mid, 5),
         ]);
 
         const feedOptions = {
@@ -37,32 +32,32 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
             },
         } as FeedOptions;
 
-        const videoItems = videoList.map((video: any) => {
+        const videoItems = videoList.map((video) => {
             return {
                 title: video.title,
                 description: video.description,
                 url: `https://www.bilibili.com/video/${video.bvid}`,
                 guid: video.bvid,
                 author: video.author,
-                date: new Date(video.created * 1000),
+                date: video.created,
                 enclosure: {
                     url: `https://${host}/api/bilibili/video/${video.bvid}`,
                     type: "audio/mp3",
                 },
                 itunesAuthor: video.author,
-                itunesDuration: convertDuration(video.length),
+                itunesDuration: video.length,
                 itunesImage: video.pic,
                 itunesTitle: video.title,
             } as Item;
         });
 
-        const audioItems = audioList.map((audio: any) => {
+        const audioItems = audioList.map((audio) => {
             return {
                 title: audio.title,
                 url: `https://www.bilibili.com/audio/au${audio.id}`,
                 guid: `au${audio.id}`,
                 author: audio.uname,
-                date: new Date(audio.passtime * 1000),
+                date: audio.passtime,
                 enclosure: {
                     url: `https://${host}/api/bilibili/audio/${audio.id}`,
                     type: "audio/mpeg",
