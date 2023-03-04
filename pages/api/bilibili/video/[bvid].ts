@@ -1,38 +1,25 @@
-import { getVideoPath } from "@/lib/bilibili";
-import { NextApiRequest, NextApiResponse } from "next";
-import fetch from "node-fetch";
+import { getVideoPath } from '@/lib/bilibili';
+import { NextResponse, type NextRequest } from 'next/server';
 
 export const config = {
-    api: {
-        responseLimit: false,
-    },
+    runtime: 'edge',
 };
 
-const handler = async (request: NextApiRequest, response: NextApiResponse) => {
-    const bvid = request.query.bvid as string;
+const handle = async (request: NextRequest) => {
+    const { searchParams } = new URL(request.url);
+    const bvid = searchParams.get('bvid')!;
 
     try {
         const path = await getVideoPath(bvid);
 
-        const requestHeaders = new Headers();
-        requestHeaders.set("referer", "https://www.bilibili.com");
-        request.headers.range &&
-            requestHeaders.set("range", request.headers.range);
-        const res = await fetch(path, { headers: requestHeaders });
-
-        res.headers.forEach((value, key) => {
-            response.setHeader(key, value);
-        });
-        response.setHeader("Content-Type", "audio/mpeg");
-
-        return response.status(200).send(res.body);
+        return await fetch(path, { headers: request.headers });
     } catch (error: any) {
-        console.warn(error);
-        const message = error.message;
-        return response.status(500).json({
-            message,
+        console.warn('Internal Server Error', error);
+        return new NextResponse(JSON.stringify({ message: error.message }), {
+            status: 500,
+            statusText: 'Internal Server Error',
         });
     }
 };
 
-export default handler;
+export default handle;

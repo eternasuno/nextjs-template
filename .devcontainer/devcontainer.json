@@ -8,7 +8,12 @@
     },
     "customizations": {
         "vscode": {
-            "extensions": ["esbenp.prettier-vscode"]
+            "extensions": [
+				"dbaeumer.vscode-eslint",
+				"eamodio.gitlens",
+				"esbenp.prettier-vscode",
+				"rangav.vscode-thunder-client"
+			]
         }
     }
 }
