@@ -1,10 +1,10 @@
-import { getUserSubmissionList,getUserInfo } from "@/lib/bilibili";
-import { GetServerSideProps } from "next";
-import { FeedOptions, Item, Podcast } from "podcast";
+import { getUserSubmissionList, getUserInfo } from '@/lib/bilibili';
+import { GetServerSideProps } from 'next';
+import { FeedOptions, Item, Podcast } from 'podcast';
 
 export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
     const host = req.headers.host;
-    const id = req.url?.split("/").at(-1)!;
+    const id = req.url?.split('/').at(-1)!;
 
     try {
         const [user, submissionList] = await Promise.all([
@@ -27,26 +27,26 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
         const itemList = submissionList.map((submission) => {
             return {
-                title: submissionList.title,
-                description: submissionList.description,
-                url: submissionList.url,
-                guid: submissionList.id,
-                author: submissionList.author,
-                date: submissionList.date,
+                title: submission.title,
+                description: submission.description,
+                url: submission.url,
+                guid: submission.id,
+                author: submission.author,
+                date: submission.date,
                 enclosure: {
-                    url: `https://${host}/api/bilibili/${submissionList.type}/${submissionList.id}`,
-                    type: "audio/mpeg",
+                    url: `https://${host}/api/bilibili/${submission.type}/${submission.id}`,
+                    type: submission.contentType,
                 },
-                itunesAuthor: submissionList.author,
-                itunesDuration: submissionList.duration,
-                itunesImage: submissionList.image,
-                itunesTitle: submissionList.title,
+                itunesAuthor: submission.author,
+                itunesDuration: submission.duration,
+                itunesImage: submission.image,
+                itunesTitle: submission.title,
             } as Item;
         });
 
         const podcast = new Podcast(feedOptions, itemList);
 
-        res.setHeader("Content-Type", "text/xml");
+        res.setHeader('Content-Type', 'text/xml');
         res.write(podcast.buildXml());
         res.end();
     } catch (error: any) {

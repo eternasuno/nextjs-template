@@ -8,6 +8,7 @@ export type User = {
 export type Submission = {
     id: string;
     type: 'video' | 'audio';
+    contentType: string;
     title: string;
     author: string;
     date: Date;
@@ -31,14 +32,14 @@ export const getUserInfo = async (id: string) => {
     } as User;
 };
 
-export const getUserSubmissionList = async(id:string, limit:number) => {
+export const getUserSubmissionList = async (id: string, limit: number) => {
     const [videoList, audioList] = await Promise.all([
-        getUserVideoList(id, limit), 
+        getUserVideoList(id, limit),
         getUserAudioList(id, limit),
     ]);
 
     return [...videoList, ...audioList]
-        .sort((a, b) => b.date - a.date)
+        .sort((a, b) => b.date.valueOf() - a.date.valueOf())
         .splice(0, limit);
 };
 
@@ -78,17 +79,21 @@ const getUserVideoList = async (id: string, limit: number) => {
     } = await get(url);
 
     return vlist
-        ? (vlist as any[]).map((video) => ({
-            id: video.bvid,
-            type: 'video',
-            title: video.title,
-            author: video.author,
-            date: new Date(video.created * 1000),
-            duration: convertDuration(video.length),
-            image: video.pic,
-            url: `https://www.bilibili.com/video/${video.bvid}`,
-            description: video.description,
-        } as Submission))
+        ? (vlist as any[]).map(
+              (video) =>
+                  ({
+                      id: video.bvid,
+                      type: 'video',
+                      contentType: 'audio/mp3',
+                      title: video.title,
+                      author: video.author,
+                      date: new Date(video.created * 1000),
+                      duration: convertDuration(video.length),
+                      image: video.pic,
+                      url: `https://www.bilibili.com/video/${video.bvid}`,
+                      description: video.description,
+                  } as Submission),
+          )
         : [];
 };
 
@@ -104,17 +109,21 @@ const getUserAudioList = async (id: string, limit: number) => {
     const { data } = await get(url);
 
     return data
-        ? (data as any[]).map((audio) => ({
-            id: audio.id,
-            type: 'audio',
-            title: audio.title,
-            author: audio.uname,
-            date: new Date(audio.passtime * 1000),
-            duration: audio.duration,
-            image: audio.cover,
-            url: `https://www.bilibili.com/audio/au${audio.id}`,
-            description: audio.lyric,
-        } as Submission))
+        ? (data as any[]).map(
+              (audio) =>
+                  ({
+                      id: audio.id,
+                      type: 'audio',
+                      contentType: 'audio/mpeg',
+                      title: audio.title,
+                      author: audio.uname,
+                      date: new Date(audio.passtime * 1000),
+                      duration: audio.duration,
+                      image: audio.cover,
+                      url: `https://www.bilibili.com/audio/au${audio.id}`,
+                      description: audio.lyric,
+                  } as Submission),
+          )
         : [];
 };
 
