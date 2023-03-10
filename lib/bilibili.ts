@@ -114,14 +114,14 @@ const getUserAudioList = async (id: string, limit: number) => {
                   ({
                       id: audio.id,
                       type: 'audio',
-                      contentType: 'audio/mpeg',
+                      contentType: 'audio/x-m4a',
                       title: audio.title,
                       author: audio.uname,
                       date: new Date(audio.passtime * 1000),
                       duration: audio.duration,
                       image: audio.cover,
                       url: `https://www.bilibili.com/audio/au${audio.id}`,
-                      description: audio.lyric,
+                      description: audio.title,
                   } as Submission),
           )
         : [];

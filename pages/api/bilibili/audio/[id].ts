@@ -18,8 +18,11 @@ const proxyMiddleware = createProxyMiddleware<NextApiRequest, NextApiResponse>({
         return await getAudioPath(id!);
     },
     on: {
+        proxyReq: (proxyReq, req, res) => {
+            proxyReq.removeHeader('User-Agent');
+        },
         proxyRes: (proxyRes) => {
-            proxyRes.headers['content-type'] = 'audio/mpeg';
+            proxyRes.headers['content-type'] = 'audio/mp4';
         },
         error: (err, _, res) => {
             console.warn(err);
