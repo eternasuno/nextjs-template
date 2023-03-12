@@ -153,10 +153,9 @@ const get = async (url: URL) => {
 };
 
 const convertDuration = (length: string) => {
-  const [hours, minutes, seconds] = length.split(':');
-  return (
-    (parseInt(hours) || 0) * 3600 +
-    (parseInt(minutes) || 0) * 60 +
-    parseInt(seconds)
-  );
+  const times = length.split(':');
+  const seconds = times.at(-1) ? parseInt(times.at(-1)!) : 0;
+  const minutes = times.at(-2) ? parseInt(times.at(-2)!) : 0;
+  const hours = times.at(-3) ? parseInt(times.at(-3)!) : 0;
+  return hours * 3600 + minutes * 60 + seconds;
 };

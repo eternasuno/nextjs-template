@@ -18,7 +18,7 @@ const proxyMiddleware = createProxyMiddleware<NextApiRequest, NextApiResponse>({
     return await getVideoPath(id!);
   },
   on: {
-    proxyReq: (proxyReq, req, res) => {
+    proxyReq: (proxyReq) => {
       proxyReq.setHeader('Referer', 'https://www.bilibili.com');
       proxyReq.setHeader('accept-encoding', 'identity');
       proxyReq.setHeader(
