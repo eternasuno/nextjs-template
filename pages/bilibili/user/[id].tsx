@@ -1,4 +1,5 @@
-import { getUserSubmissionList, getUserInfo } from '@/lib/bilibili';
+import { getUserInfo, getUserVideoList } from '@/lib/bilibili';
+import { tryGet } from '@/lib/cache';
 import { GetServerSideProps } from 'next';
 import { FeedOptions, Item, Podcast } from 'podcast';
 
@@ -8,8 +9,11 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
   try {
     const [user, submissionList] = await Promise.all([
-      getUserInfo(id),
-      getUserSubmissionList(id, 5),
+      tryGet(`bilibili_user_${id}`, async () => await getUserInfo(id)),
+      tryGet(
+        `bilibili_user_videos_${id}`,
+        async () => await getUserVideoList(id, 5),
+      ),
     ]);
 
     const feedOptions = {
