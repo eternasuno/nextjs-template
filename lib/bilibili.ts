@@ -67,7 +67,7 @@ export const getAudioPath = async (id: string) => {
   return cdns[0] as string;
 };
 
-const getUserVideoList = async (id: string, limit: number) => {
+export const getUserVideoList = async (id: string, limit: number) => {
   const url = new URL('https://api.bilibili.com/x/space/wbi/arc/search');
   url.searchParams.append('mid', id);
   url.searchParams.append('ps', String(limit));

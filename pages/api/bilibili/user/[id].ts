@@ -1,19 +1,29 @@
-import { getUserSubmissionList, getUserInfo } from '@/lib/bilibili';
-import { GetServerSideProps } from 'next';
+import {
+  getUserInfo,
+  getUserVideoList,
+  Submission,
+  User,
+} from '@/lib/bilibili';
+import { tryGet } from '@/lib/cache';
+import { NextApiRequest, NextApiResponse } from 'next';
 import { FeedOptions, Item, Podcast } from 'podcast';
 
-export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  const id = req.query.id as string;
+  const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
   const host = req.headers.host;
-  const id = req.url?.split('/').at(-1)!;
 
   try {
     const [user, submissionList] = await Promise.all([
-      getUserInfo(id),
-      getUserSubmissionList(id, 5),
+      tryGet<User>(`bilibili_user_${id}`, async () => await getUserInfo(id)),
+      tryGet<Submission[]>(
+        `bilibili_user_videos_${id}_${limit}`,
+        async () => await getUserVideoList(id, limit),
+      ),
     ]);
 
     const feedOptions = {
-      title: user.name,
+      title: `${user.name}的视频投稿`,
       description: user.description,
       siteUrl: `https://space.bilibili.com/${user.id}`,
       imageUrl: user.image,
@@ -46,21 +56,14 @@ export const getServerSideProps: GetServerSideProps = async ({ req, res }) => {
 
     const podcast = new Podcast(feedOptions, itemList);
 
-    res.setHeader('Content-Type', 'text/xml');
-    res.write(podcast.buildXml());
-    res.end();
+    res
+      .status(200)
+      .setHeader('Content-Type', 'text/xml')
+      .send(podcast.buildXml());
   } catch (error: any) {
     console.warn(error);
-    res.statusCode = 500;
-    res.statusMessage = error.message;
-    res.end();
+    res.status(500).send(error.message);
   }
-
-  return {
-    props: {},
-  };
 };
 
-const User = () => {};
-
-export default User;
+export default handler;
