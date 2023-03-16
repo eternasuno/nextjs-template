@@ -18,8 +18,8 @@ max_line_length = 80
 [*.json]
 insert_final_newline = ignore
 
-[*.js]
-indent_size=2
+[*.{js,ts}]
+indent_size = 2
 
 # Minified JavaScript files shouldn't be changed
 [**.min.js]

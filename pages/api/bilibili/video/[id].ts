@@ -1,4 +1,5 @@
 import { getVideoPath } from '@/lib/bilibili';
+import { tryGet } from '@/lib/cache';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -15,7 +16,12 @@ const proxyMiddleware = createProxyMiddleware<NextApiRequest, NextApiResponse>({
   pathRewrite: () => '',
   router: async (req) => {
     const id = req.query.id as string;
-    return await getVideoPath(id!);
+    return tryGet(
+      `bilibili_video_path_${id}`,
+      async () => await getVideoPath(id!),
+      '14400',
+      false,
+    );
   },
   on: {
     proxyReq: (proxyReq) => {
@@ -36,7 +42,7 @@ const proxyMiddleware = createProxyMiddleware<NextApiRequest, NextApiResponse>({
   },
 });
 
-const handle = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   proxyMiddleware(req, res, (result: unknown) => {
     if (result instanceof Error) {
       throw result;
@@ -44,4 +50,4 @@ const handle = async (req: NextApiRequest, res: NextApiResponse) => {
   });
 };
 
-export default handle;
+export default handler;
