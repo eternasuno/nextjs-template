@@ -48,15 +48,11 @@ export const getUserSubmissionList = async (
     : await getUserVideoList(id, limit);
 };
 
-export const getSeasonInfo = async (
-  uid: string,
-  sid: string,
-  limit: number,
-) => {
+export const getSeasonInfo = async (sid: string, limit: number) => {
   const url = new URL(
     'https://api.bilibili.com/x/polymer/space/seasons_archives_list',
   );
-  url.searchParams.append('mid', uid);
+  url.searchParams.append('mid', '1');
   url.searchParams.append('season_id', sid);
   url.searchParams.append('sort_reverse', 'true');
   url.searchParams.append('page_num', '1');
@@ -68,20 +64,19 @@ export const getSeasonInfo = async (
     return {} as Season;
   }
 
-  const submissionList = (archives as any[]).map(
-    (archive) =>
-      ({
-        id: archive.bvid,
-        type: 'video',
-        contentType: 'audio/mp4',
-        title: archive.title,
-        date: new Date(archive.ctime * 1000),
-        duration: archive.duration,
-        image: archive.pic,
-        url: `https://www.bilibili.com/video/${archive.bvid}`,
-        description: '',
-      } as Submission),
-  );
+  const submissionList = (archives as any[]).map((archive) => {
+    return {
+      id: archive.bvid,
+      type: 'video',
+      contentType: 'audio/mp4',
+      title: archive.title,
+      date: new Date(archive.ctime * 1000),
+      duration: archive.duration,
+      image: archive.pic,
+      url: `https://www.bilibili.com/video/${archive.bvid}`,
+      description: '',
+    } as Submission;
+  });
 
   return {
     title: meta.name,
@@ -128,20 +123,19 @@ const getUserVideoList = async (id: string, limit: number) => {
     return [] as Submission[];
   }
 
-  return (vlist as any[]).map(
-    (video) =>
-      ({
-        id: video.bvid,
-        type: 'video',
-        contentType: 'audio/mp4',
-        title: video.title,
-        date: new Date(video.created * 1000),
-        duration: convertDuration(video.length),
-        image: video.pic,
-        url: `https://www.bilibili.com/video/${video.bvid}`,
-        description: video.description,
-      } as Submission),
-  );
+  return (vlist as any[]).map((video) => {
+    return {
+      id: video.bvid,
+      type: 'video',
+      contentType: 'audio/mp4',
+      title: video.title,
+      date: new Date(video.created * 1000),
+      duration: convertDuration(video.length),
+      image: video.pic,
+      url: `https://www.bilibili.com/video/${video.bvid}`,
+      description: video.description,
+    } as Submission;
+  });
 };
 
 const getUserAudioList = async (id: string, limit: number) => {
@@ -159,20 +153,19 @@ const getUserAudioList = async (id: string, limit: number) => {
     return [] as Submission[];
   }
 
-  return (data as any[]).map(
-    (audio) =>
-      ({
-        id: audio.id,
-        type: 'audio',
-        contentType: 'audio/x-m4a',
-        title: audio.title,
-        date: new Date(audio.passtime * 1000),
-        duration: audio.duration,
-        image: audio.cover,
-        url: `https://www.bilibili.com/audio/au${audio.id}`,
-        description: audio.title,
-      } as Submission),
-  );
+  return (data as any[]).map((audio) => {
+    return {
+      id: audio.id,
+      type: 'audio',
+      contentType: 'audio/x-m4a',
+      title: audio.title,
+      date: new Date(audio.passtime * 1000),
+      duration: audio.duration,
+      image: audio.cover,
+      url: `https://www.bilibili.com/audio/au${audio.id}`,
+      description: audio.title,
+    } as Submission;
+  });
 };
 
 const getVideoCid = async (id: string) => {

@@ -1,68 +1,48 @@
 import { getSeasonInfo, getUserInfo, Season, User } from '@/lib/bilibili';
 import { tryGet } from '@/lib/cache';
-import { NextApiRequest, NextApiResponse } from 'next';
-import { FeedOptions, Item, Podcast } from 'podcast';
+import withPodcast, { Feed, FeedItem } from '@/lib/with-podcast';
+import { NextApiRequest } from 'next';
 
-const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+const handler = async (req: NextApiRequest) => {
   const uid = req.query.uid as string;
   const sid = req.query.sid as string;
   const host = req.headers.host;
   const limit =
     typeof req.query.limit === 'string' ? parseInt(req.query.limit) : 5;
 
-  try {
-    const [user, season] = await Promise.all([
-      tryGet<User>(
-        `bilibili_user_${uid}`,
-        async () => await getUserInfo(uid),
-        86400,
-      ),
-      tryGet<Season>(
-        `bilibili_user_${uid}_season_${sid}_${limit}`,
-        async () => await getSeasonInfo(uid, sid, limit),
-      ),
-    ]);
+  const [user, season] = await Promise.all([
+    tryGet<User>(
+      `bilibili_user_${uid}`,
+      async () => await getUserInfo(uid),
+      86400,
+    ),
+    tryGet<Season>(
+      `bilibili_season_${sid}_${limit}`,
+      async () => await getSeasonInfo(sid, limit),
+    ),
+  ]);
 
-    const feedOptions = {
-      title: season.title,
-      description: season.description,
-      siteUrl: `https://space.bilibili.com/${uid}/channel/collectiondetail?sid=${sid}`,
-      imageUrl: season.image,
-      pubDate: new Date(),
-      itunesAuthor: user.name,
-      itunesImage: user.image,
-      itunesOwner: {
-        name: user.name,
-      },
-    } as FeedOptions;
+  const feedItemList = season.submissionList.map((submission) => {
+    return {
+      title: submission.title,
+      description: submission.description,
+      url: submission.url,
+      date: submission.date,
+      enclosure_url: `https://${host}/api/sounds/bilibili/${submission.type}/${submission.id}`,
+      enclosure_type: submission.contentType,
+      duration: submission.duration,
+      image: submission.image,
+    } as FeedItem;
+  });
 
-    const itemList = season.submissionList.map((submission) => {
-      return {
-        title: submission.title,
-        description: submission.description,
-        url: submission.url,
-        guid: submission.id,
-        date: submission.date,
-        enclosure: {
-          url: `https://${host}/api/sounds/bilibili/${submission.type}/${submission.id}`,
-          type: submission.contentType,
-        },
-        itunesDuration: submission.duration,
-        itunesImage: submission.image,
-        itunesTitle: submission.title,
-      } as Item;
-    });
-
-    const podcast = new Podcast(feedOptions, itemList);
-
-    res
-      .status(200)
-      .setHeader('Content-Type', 'text/xml')
-      .send(podcast.buildXml());
-  } catch (error: any) {
-    console.warn(error);
-    res.status(500).send(error.message);
-  }
+  return {
+    title: season.title,
+    author: user.name,
+    description: season.description,
+    url: `https://space.bilibili.com/${uid}/channel/collectiondetail?sid=${sid}`,
+    image: season.image,
+    items: feedItemList,
+  } as Feed;
 };
 
-export default handler;
+export default withPodcast(handler);
