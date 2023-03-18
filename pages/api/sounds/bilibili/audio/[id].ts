@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 export const config = {
   api: {
+    responseLimit: false,
     externalResolver: true,
   },
 };
@@ -19,21 +20,21 @@ const proxyMiddleware = createProxyMiddleware<NextApiRequest, NextApiResponse>({
     return tryGet(
       `bilibili_audio_path_${id}`,
       async () => await getAudioPath(id!),
-      '14400',
-      false,
+      14400,
     );
   },
   on: {
     proxyReq: (proxyReq) => {
-      proxyReq.setHeader('Referer', 'https://www.bilibili.com');
-      proxyReq.setHeader('accept-encoding', 'identity');
+      proxyReq.setHeader('referer', 'https://www.bilibili.com');
       proxyReq.setHeader(
         'user-agent',
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15',
       );
+      console.debug(proxyReq.getHeaders());
     },
     proxyRes: (proxyRes) => {
       proxyRes.headers['content-type'] = 'audio/mp4';
+      console.debug(proxyRes.headers);
     },
     error: (err, _, res) => {
       console.warn(err);

@@ -1,64 +1,8 @@
+import { Cache } from '@/lib/cache';
 import Redis from 'ioredis';
-import { env } from 'process';
 
-const { CACHE_EXPIRE, REDIS_URL } = env;
-
-export const get = async (key: string, refresh = true) => {
-  redis = await connect();
-
-  if (key) {
-    const cacheTtlKey = getCacheTtlKey(key);
-    let [value, cacheTtl] = await redis.mget(key, cacheTtlKey);
-
-    if (value && refresh) {
-      if (cacheTtl) {
-        redis.expire(cacheTtlKey, cacheTtl);
-      } else {
-        cacheTtl = CACHE_EXPIRE || '86400';
-      }
-
-      redis.expire(key, cacheTtl);
-    }
-
-    return value;
-  }
-};
-
-export const set = async (
-  key: string,
-  value: any,
-  maxAge = CACHE_EXPIRE || '86400',
-) => {
-  if (!key) {
-    return;
-  }
-
-  redis = await connect();
-
-  if (!value || value === 'undefined') {
-    value = '';
-  }
-
-  if (typeof value === 'object') {
-    value = JSON.stringify(value);
-  }
-
-  if (maxAge !== CACHE_EXPIRE) {
-    redis.set(getCacheTtlKey(key), maxAge, 'EX', maxAge);
-  }
-
-  return redis.set(key, value, 'EX', maxAge);
-};
-
-const connect = async () => {
-  if (redis) {
-    if (!['connecting', 'connect', 'ready'].includes(redis.status)) {
-      await redis.connect();
-    }
-    return redis;
-  }
-
-  redis = new Redis(REDIS_URL!);
+const createCache = (url: string, defaultTtl: number) => {
+  const redis = new Redis(url);
   redis.on('error', (error) => {
     console.warn('Redis error:', error);
   });
@@ -66,7 +10,46 @@ const connect = async () => {
     console.info('Redis connected.');
   });
 
-  return redis;
+  const get = async (key: string, refresh: boolean) => {
+    if (!key) {
+      throw Error('key can not be empty.');
+    }
+
+    const cacheTtlKey = getCacheTtlKey(key);
+    const [value, cacheTtl] = await redis.mget(key, cacheTtlKey);
+
+    if (value && refresh) {
+      if (cacheTtl) {
+        redis.expire(cacheTtlKey, cacheTtl);
+      }
+
+      redis.expire(key, cacheTtl || defaultTtl);
+    }
+
+    return value;
+  };
+
+  const set = async (key: string, value: any, maxAge: number) => {
+    if (!key) {
+      return;
+    }
+
+    if (!value || value === 'undefined') {
+      value = '';
+    }
+
+    if (typeof value === 'object') {
+      value = JSON.stringify(value);
+    }
+
+    if (maxAge !== defaultTtl) {
+      redis.set(getCacheTtlKey(key), maxAge, 'EX', maxAge);
+    }
+
+    redis.set(key, value, 'EX', maxAge);
+  };
+
+  return { get, set } as Cache;
 };
 
 const getCacheTtlKey = (key: string) => {
@@ -79,4 +62,4 @@ const getCacheTtlKey = (key: string) => {
   return `cacheTtl:${key}`;
 };
 
-let redis: Redis | null = null;
+export default createCache;

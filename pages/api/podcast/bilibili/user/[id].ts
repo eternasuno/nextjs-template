@@ -1,6 +1,6 @@
 import {
   getUserInfo,
-  getUserVideoList,
+  getUserSubmissionList,
   Submission,
   User,
 } from '@/lib/bilibili';
@@ -10,20 +10,26 @@ import { FeedOptions, Item, Podcast } from 'podcast';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
   const id = req.query.id as string;
-  const limit = req.query.limit ? parseInt(req.query.limit as string) : 5;
   const host = req.headers.host;
+  const type = req.query.type === 'audio' ? 'audio' : 'video';
+  const limit =
+    typeof req.query.limit === 'string' ? parseInt(req.query.limit) : 5;
 
   try {
     const [user, submissionList] = await Promise.all([
-      tryGet<User>(`bilibili_user_${id}`, async () => await getUserInfo(id)),
+      tryGet<User>(
+        `bilibili_user_${id}`,
+        async () => await getUserInfo(id),
+        86400,
+      ),
       tryGet<Submission[]>(
-        `bilibili_user_videos_${id}_${limit}`,
-        async () => await getUserVideoList(id, limit),
+        `bilibili_user_${type}_${id}_${limit}`,
+        async () => await getUserSubmissionList(id, limit, type),
       ),
     ]);
 
     const feedOptions = {
-      title: `${user.name}的视频投稿`,
+      title: `${user.name}的${type === 'audio' ? '音频' : '视频'}投稿`,
       description: user.description,
       siteUrl: `https://space.bilibili.com/${user.id}`,
       imageUrl: user.image,
@@ -44,7 +50,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         author: submission.author,
         date: submission.date,
         enclosure: {
-          url: `https://${host}/api/bilibili/${submission.type}/${submission.id}`,
+          url: `http://${host}/api/sounds/bilibili/${submission.type}/${submission.id}`,
           type: submission.contentType,
         },
         itunesAuthor: submission.author,

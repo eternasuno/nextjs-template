@@ -1,17 +1,21 @@
 import { env } from 'process';
-import * as redisCache from '@/lib/cache/redis';
+import { default as createRedisCache } from '@/lib/cache/redis';
+import { default as createNoCache } from '@/lib/cache/no';
 
-const { CACHE_TYPE, CACHE_EXPIRE } = env;
+const { CACHE_TYPE, CACHE_EXPIRE, REDIS_URL } = env;
+const DEFAULT_TTL = CACHE_EXPIRE ? parseInt(CACHE_EXPIRE) : 3600;
+
+export type Cache = {
+  get: (..._: any) => Promise<string | null> | null;
+  set: (..._: any) => Promise<void> | null;
+};
 
 const createCache = () => {
   switch (CACHE_TYPE) {
     case 'redis':
-      return redisCache;
+      return createRedisCache(REDIS_URL!, DEFAULT_TTL);
     default:
-      return {
-        get: (..._: any) => null,
-        set: (..._: any) => null,
-      };
+      return createNoCache();
   }
 };
 
@@ -20,8 +24,8 @@ const cache = createCache();
 export const tryGet = async <T = string>(
   key: string,
   getValueFunc: () => any,
-  maxAge = CACHE_EXPIRE,
-  refresh = true,
+  maxAge = DEFAULT_TTL,
+  refresh = false,
 ) => {
   let value = await cache.get(key, refresh);
   if (!value) {

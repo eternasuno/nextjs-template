@@ -9,12 +9,13 @@
     "customizations": {
         "vscode": {
             "extensions": [
-                "dbaeumer.vscode-eslint",
-                "eamodio.gitlens",
-                "esbenp.prettier-vscode",
-                "rangav.vscode-thunder-client",
-                "EditorConfig.EditorConfig"
-            ]
+				"dbaeumer.vscode-eslint",
+				"eamodio.gitlens",
+				"esbenp.prettier-vscode",
+				"rangav.vscode-thunder-client",
+				"EditorConfig.EditorConfig",
+				"cweijan.vscode-database-client2"
+			]
         }
     }
 }
