@@ -1,38 +1,33 @@
-import {
-  getUserInfo,
-  getUserSubmissionList,
-  Submission,
-  User,
-} from '@/lib/bilibili';
+import { getSeasonInfo, getUserInfo, Season, User } from '@/lib/bilibili';
 import { tryGet } from '@/lib/cache';
 import { NextApiRequest, NextApiResponse } from 'next';
 import { FeedOptions, Item, Podcast } from 'podcast';
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  const id = req.query.id as string;
+  const uid = req.query.uid as string;
+  const sid = req.query.sid as string;
   const host = req.headers.host;
-  const type = req.query.type === 'audio' ? 'audio' : 'video';
   const limit =
     typeof req.query.limit === 'string' ? parseInt(req.query.limit) : 5;
 
   try {
-    const [user, submissionList] = await Promise.all([
+    const [user, season] = await Promise.all([
       tryGet<User>(
-        `bilibili_user_${id}`,
-        async () => await getUserInfo(id),
+        `bilibili_user_${uid}`,
+        async () => await getUserInfo(uid),
         86400,
       ),
-      tryGet<Submission[]>(
-        `bilibili_user_${type}_${id}_${limit}`,
-        async () => await getUserSubmissionList(id, limit, type),
+      tryGet<Season>(
+        `bilibili_user_${uid}_season_${sid}_${limit}`,
+        async () => await getSeasonInfo(uid, sid, limit),
       ),
     ]);
 
     const feedOptions = {
-      title: `${user.name}的${type === 'audio' ? '音频' : '视频'}投稿`,
-      description: user.description,
-      siteUrl: `https://space.bilibili.com/${user.id}`,
-      imageUrl: user.image,
+      title: season.title,
+      description: season.description,
+      siteUrl: `https://space.bilibili.com/${uid}/channel/collectiondetail?sid=${sid}`,
+      imageUrl: season.image,
       pubDate: new Date(),
       itunesAuthor: user.name,
       itunesImage: user.image,
@@ -41,19 +36,17 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
       },
     } as FeedOptions;
 
-    const itemList = submissionList.map((submission) => {
+    const itemList = season.submissionList.map((submission) => {
       return {
         title: submission.title,
         description: submission.description,
         url: submission.url,
         guid: submission.id,
-        author: submission.author,
         date: submission.date,
         enclosure: {
           url: `https://${host}/api/sounds/bilibili/${submission.type}/${submission.id}`,
           type: submission.contentType,
         },
-        itunesAuthor: submission.author,
         itunesDuration: submission.duration,
         itunesImage: submission.image,
         itunesTitle: submission.title,
