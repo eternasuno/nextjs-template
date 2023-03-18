@@ -50,7 +50,7 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
         author: submission.author,
         date: submission.date,
         enclosure: {
-          url: `http://${host}/api/sounds/bilibili/${submission.type}/${submission.id}`,
+          url: `https://${host}/api/sounds/bilibili/${submission.type}/${submission.id}`,
           type: submission.contentType,
         },
         itunesAuthor: submission.author,
