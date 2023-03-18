@@ -5,9 +5,11 @@ export type User = {
   description: string;
 };
 
+export type SubmissionType = 'video' | 'audio';
+
 export type Submission = {
   id: string;
-  type: 'video' | 'audio';
+  type: SubmissionType;
   contentType: string;
   title: string;
   author: string;
@@ -32,15 +34,14 @@ export const getUserInfo = async (id: string) => {
   } as User;
 };
 
-export const getUserSubmissionList = async (id: string, limit: number) => {
-  const [videoList, audioList] = await Promise.all([
-    getUserVideoList(id, limit),
-    getUserAudioList(id, limit),
-  ]);
-
-  return [...videoList, ...audioList]
-    .sort((a, b) => b.date.valueOf() - a.date.valueOf())
-    .splice(0, limit);
+export const getUserSubmissionList = async (
+  id: string,
+  limit: number,
+  type: SubmissionType = 'video',
+) => {
+  return type === 'audio'
+    ? await getUserAudioList(id, limit)
+    : await getUserVideoList(id, limit);
 };
 
 export const getVideoPath = async (id: string) => {
@@ -67,7 +68,7 @@ export const getAudioPath = async (id: string) => {
   return cdns[0] as string;
 };
 
-export const getUserVideoList = async (id: string, limit: number) => {
+const getUserVideoList = async (id: string, limit: number) => {
   const url = new URL('https://api.bilibili.com/x/space/wbi/arc/search');
   url.searchParams.append('mid', id);
   url.searchParams.append('ps', String(limit));
@@ -134,7 +135,7 @@ const getVideoCid = async (id: string) => {
 };
 
 const get = async (url: URL) => {
-  const response = await fetch(url.toString(), {
+  const response = await fetch(url, {
     headers: {
       'User-Agent':
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15',

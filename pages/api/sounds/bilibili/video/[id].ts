@@ -5,6 +5,7 @@ import type { NextApiRequest, NextApiResponse } from 'next';
 
 export const config = {
   api: {
+    responseLimit: false,
     externalResolver: true,
   },
 };
@@ -19,14 +20,12 @@ const proxyMiddleware = createProxyMiddleware<NextApiRequest, NextApiResponse>({
     return tryGet(
       `bilibili_video_path_${id}`,
       async () => await getVideoPath(id!),
-      '14400',
-      false,
+      14400,
     );
   },
   on: {
     proxyReq: (proxyReq) => {
       proxyReq.setHeader('Referer', 'https://www.bilibili.com');
-      proxyReq.setHeader('accept-encoding', 'identity');
       proxyReq.setHeader(
         'user-agent',
         'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15',
