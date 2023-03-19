@@ -58,8 +58,8 @@ const handler = async (req: NextApiRequest) => {
   const { name, description, image } = user;
 
   return {
-    title: name,
-    author: `${name}的音频投稿`,
+    title: `${name}的音频投稿`,
+    author: name,
     description,
     url: `https://space.bilibili.com/${uid}/audio`,
     image,
