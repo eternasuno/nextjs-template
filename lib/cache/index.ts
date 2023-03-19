@@ -1,9 +1,7 @@
-import { env } from 'process';
-import { default as createRedisCache } from '@/lib/cache/redis';
 import { default as createNoCache } from '@/lib/cache/no';
-
-const { CACHE_TYPE, CACHE_EXPIRE, REDIS_URI } = env;
-const DEFAULT_TTL = CACHE_EXPIRE ? parseInt(CACHE_EXPIRE) : 3600;
+import { default as createRedisCache } from '@/lib/cache/redis';
+import config from '@/lib/config';
+import { md5 } from '@/lib/crypto';
 
 export type Cache = {
   get: (..._: any) => Promise<string | null> | null;
@@ -11,9 +9,9 @@ export type Cache = {
 };
 
 const createCache = () => {
-  switch (CACHE_TYPE) {
+  switch (config.cache.type) {
     case 'redis':
-      return createRedisCache(REDIS_URI!, DEFAULT_TTL);
+      return createRedisCache(config.redis.uri!, config.cache.expire);
     default:
       return createNoCache();
   }
@@ -21,28 +19,26 @@ const createCache = () => {
 
 const cache = createCache();
 
-export const tryGet = async <T = string>(
+const tryGet = async <T = string>(
   key: string,
   getValueFunc: () => any,
-  maxAge = DEFAULT_TTL,
-  refresh = false,
+  maxAge = config.cache.expire,
+  refresh = true,
 ) => {
-  let value = await cache.get(key, refresh);
-  if (!value) {
-    value = await getValueFunc();
-    cache.set(key, value, maxAge);
-  } else {
-    let parsed;
-    try {
-      parsed = JSON.parse(value);
-    } catch (error) {
-      parsed = null;
-    }
+  const keyMd5 = md5(key);
 
-    if (parsed) {
-      value = parsed;
+  const cacheVal = await cache.get(keyMd5, refresh);
+  if (cacheVal) {
+    try {
+      return JSON.parse(cacheVal) as T;
+    } catch (error) {
+      return cacheVal as T;
     }
   }
 
+  const value = await getValueFunc();
+  cache.set(keyMd5, value, maxAge);
   return value as T;
 };
+
+export default tryGet;

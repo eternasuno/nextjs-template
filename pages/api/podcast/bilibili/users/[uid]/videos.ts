@@ -1,5 +1,5 @@
 import {
-  getSeasonInfo,
+  getSubBVIdList,
   getUserInfo,
   getVideoInfo,
   User,
@@ -13,24 +13,23 @@ import { NextApiRequest } from 'next';
 
 const handler = async (req: NextApiRequest) => {
   const uid = req.query.uid as string;
-  const sid = req.query.sid as string;
   const host = req.headers.host;
   const limit =
     typeof req.query.limit === 'string'
       ? parseInt(req.query.limit)
       : config.limit;
 
-  const [user, season] = await Promise.all([
+  const [user, bvidList] = await Promise.all([
     tryGet<User>(
       `bilibili_user_${uid}`,
       async () => await getUserInfo(uid),
       config.cache.lastingExpire,
     ),
-    getSeasonInfo(sid, limit),
+    getSubBVIdList(uid, limit),
   ]);
 
   const videoList = await Promise.all(
-    season.bvidList.map(async (bvid) => {
+    bvidList.map(async (bvid) => {
       return await tryGet<Video>(
         `bilibili_video_${bvid}`,
         async () => {
@@ -57,12 +56,14 @@ const handler = async (req: NextApiRequest) => {
     } as FeedItem;
   });
 
+  const { name, description, image } = user;
+
   return {
-    title: season.name,
-    author: user.name,
-    description: season.description || user.description,
-    url: `https://space.bilibili.com/${uid}/channel/collectiondetail?sid=${sid}`,
-    image: season.image,
+    title: name,
+    author: `${name}的视频投稿`,
+    description,
+    url: `https://space.bilibili.com/${uid}/video`,
+    image,
     items: feedItemList,
   } as Feed;
 };

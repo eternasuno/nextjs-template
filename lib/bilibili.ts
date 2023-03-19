@@ -5,23 +5,37 @@ export type User = {
   description: string;
 };
 
-export type Submission = {
+export type SubVideo = {
   id: string;
-  type: 'video' | 'audio';
-  contentType: string;
-  title: string;
-  date: Date;
+  name: string;
   duration: number;
+};
+
+export type Video = {
+  id: string;
+  name: string;
+  author: string;
   image: string;
-  url: string;
+  pubDate: Date;
+  description: string;
+  subVideoList: SubVideo[];
+};
+
+export type Audio = {
+  id: string;
+  name: string;
+  image: string;
+  duration: number;
+  pubDate: Date;
   description: string;
 };
 
 export type Season = {
-  title: string;
+  id: string;
+  name: string;
   image: string;
   description: string;
-  submissionList: Submission[];
+  bvidList: string[];
 };
 
 export const getUserInfo = async (id: string) => {
@@ -38,59 +52,111 @@ export const getUserInfo = async (id: string) => {
   } as User;
 };
 
-export const getUserSubmissionList = async (
-  id: string,
-  limit: number,
-  type: 'video' | 'audio' = 'video',
-) => {
-  return type === 'audio'
-    ? await getUserAudioList(id, limit)
-    : await getUserVideoList(id, limit);
+export const getSubBVIdList = async (id: string, limit: number) => {
+  const url = new URL('https://api.bilibili.com/x/space/wbi/arc/search');
+  url.searchParams.append('mid', id);
+  url.searchParams.append('ps', String(limit));
+
+  const {
+    list: { vlist },
+  } = await get(url);
+
+  if (!Array.isArray(vlist)) {
+    return [] as string[];
+  }
+
+  return vlist.map((v) => v.bvid as string);
 };
 
-export const getSeasonInfo = async (sid: string, limit: number) => {
+export const getVideoInfo = async (id: string) => {
+  const url = new URL('https://api.bilibili.com/x/web-interface/view');
+  url.searchParams.append('bvid', id);
+
+  const data = await get(url);
+
+  const subVideoList = (data.pages as any[]).map((item) => {
+    return {
+      id: item.cid,
+      name: item.part,
+      duration: item.duration,
+    } as SubVideo;
+  });
+
+  return {
+    id,
+    name: data.title,
+    author: data.owner.name,
+    image: data.pic,
+    pubDate: new Date(data.pubDate * 1000),
+    description: data.desc,
+    subVideoList,
+  } as Video;
+};
+
+export const getSubAUIdList = async (id: string, limit: number) => {
+  const url = new URL(
+    'https://api.bilibili.com/audio/music-service/web/song/upper',
+  );
+  url.searchParams.append('uid', id);
+  url.searchParams.append('pn', '1');
+  url.searchParams.append('ps', String(limit));
+  url.searchParams.append('order', '1');
+
+  const { data } = await get(url);
+
+  if (!Array.isArray(data)) {
+    return [] as string[];
+  }
+
+  return data.map((item) => item.id as string);
+};
+
+export const getAudioInfo = async (id: string) => {
+  const url = new URL(
+    'https://www.bilibili.com/audio/music-service-c/web/song/info',
+  );
+  url.searchParams.append('sid', id);
+
+  const { title, cover, duration, passtime, intro } = await get(url);
+
+  return {
+    id,
+    name: title,
+    image: cover,
+    duration,
+    pubDate: new Date(passtime * 1000),
+    description: intro,
+  } as Audio;
+};
+
+export const getSeasonInfo = async (id: string, limit: number) => {
   const url = new URL(
     'https://api.bilibili.com/x/polymer/space/seasons_archives_list',
   );
   url.searchParams.append('mid', '1');
-  url.searchParams.append('season_id', sid);
+  url.searchParams.append('season_id', id);
   url.searchParams.append('sort_reverse', 'true');
   url.searchParams.append('page_num', '1');
   url.searchParams.append('page_size', String(limit));
 
   const { archives, meta } = await get(url);
 
-  if (!archives || !meta) {
+  if (!Array.isArray(archives) || !meta) {
     return {} as Season;
   }
 
-  const submissionList = (archives as any[]).map((archive) => {
-    return {
-      id: archive.bvid,
-      type: 'video',
-      contentType: 'audio/mp4',
-      title: archive.title,
-      date: new Date(archive.ctime * 1000),
-      duration: archive.duration,
-      image: archive.pic,
-      url: `https://www.bilibili.com/video/${archive.bvid}`,
-      description: '',
-    } as Submission;
-  });
-
   return {
-    title: meta.name,
+    id,
+    name: meta.name,
     image: meta.cover,
     description: meta.description,
-    submissionList,
+    bvidList: archives.map((archive) => archive.bvid as string),
   } as Season;
 };
 
-export const getVideoPath = async (id: string) => {
-  const cid = await getVideoCid(id);
-
+export const getVideoPath = async (bvid: string, cid: string) => {
   const url = new URL('https://api.bilibili.com/x/player/playurl');
-  url.searchParams.append('bvid', id);
+  url.searchParams.append('bvid', bvid);
   url.searchParams.append('cid', cid);
   url.searchParams.append('fnval', '16');
 
@@ -110,72 +176,6 @@ export const getAudioPath = async (id: string) => {
   return cdns[0] as string;
 };
 
-const getUserVideoList = async (id: string, limit: number) => {
-  const url = new URL('https://api.bilibili.com/x/space/wbi/arc/search');
-  url.searchParams.append('mid', id);
-  url.searchParams.append('ps', String(limit));
-
-  const {
-    list: { vlist },
-  } = await get(url);
-
-  if (!vlist) {
-    return [] as Submission[];
-  }
-
-  return (vlist as any[]).map((video) => {
-    return {
-      id: video.bvid,
-      type: 'video',
-      contentType: 'audio/mp4',
-      title: video.title,
-      date: new Date(video.created * 1000),
-      duration: convertDuration(video.length),
-      image: video.pic,
-      url: `https://www.bilibili.com/video/${video.bvid}`,
-      description: video.description,
-    } as Submission;
-  });
-};
-
-const getUserAudioList = async (id: string, limit: number) => {
-  const url = new URL(
-    'https://api.bilibili.com/audio/music-service/web/song/upper',
-  );
-  url.searchParams.append('uid', id);
-  url.searchParams.append('pn', '1');
-  url.searchParams.append('ps', String(limit));
-  url.searchParams.append('order', '1');
-
-  const { data } = await get(url);
-
-  if (!data) {
-    return [] as Submission[];
-  }
-
-  return (data as any[]).map((audio) => {
-    return {
-      id: audio.id,
-      type: 'audio',
-      contentType: 'audio/x-m4a',
-      title: audio.title,
-      date: new Date(audio.passtime * 1000),
-      duration: audio.duration,
-      image: audio.cover,
-      url: `https://www.bilibili.com/audio/au${audio.id}`,
-      description: audio.title,
-    } as Submission;
-  });
-};
-
-const getVideoCid = async (id: string) => {
-  const url = new URL('https://api.bilibili.com/x/web-interface/view');
-  url.searchParams.append('bvid', id);
-
-  const { cid } = await get(url);
-  return cid;
-};
-
 const get = async (url: URL) => {
   const response = await fetch(url, {
     headers: {
@@ -193,12 +193,4 @@ const get = async (url: URL) => {
   }
 
   return data;
-};
-
-const convertDuration = (length: string) => {
-  const times = length.split(':');
-  const seconds = times.at(-1) ? parseInt(times.at(-1)!) : 0;
-  const minutes = times.at(-2) ? parseInt(times.at(-2)!) : 0;
-  const hours = times.at(-3) ? parseInt(times.at(-3)!) : 0;
-  return hours * 3600 + minutes * 60 + seconds;
 };

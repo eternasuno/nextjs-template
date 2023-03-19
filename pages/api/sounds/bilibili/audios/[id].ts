@@ -1,5 +1,6 @@
-import { getVideoPath } from '@/lib/bilibili';
-import { tryGet } from '@/lib/cache';
+import { getAudioPath } from '@/lib/bilibili';
+import tryGet from '@/lib/cache';
+import { default as appConfig } from '@/lib/config';
 import { createProxyMiddleware } from 'http-proxy-middleware';
 import type { NextApiRequest, NextApiResponse } from 'next';
 
@@ -16,20 +17,22 @@ const proxyMiddleware = createProxyMiddleware<NextApiRequest, NextApiResponse>({
   target: 'https://www.bilibili.com',
   pathRewrite: () => '',
   router: async (req) => {
-    const id = req.query.id as string;
-    return tryGet(
-      `bilibili_video_path_${id}`,
-      async () => await getVideoPath(id!),
-      14400,
-    );
+    try {
+      const id = req.query.id as string;
+      return tryGet(
+        `bilibili_audio_path_${id}`,
+        async () => await getAudioPath(id!),
+        appConfig.cache.lastingExpire,
+      );
+    } catch (error: any) {
+      console.warn(error.message);
+      return 'https://www.bilibili.com/404';
+    }
   },
   on: {
     proxyReq: (proxyReq) => {
-      proxyReq.setHeader('Referer', 'https://www.bilibili.com');
-      proxyReq.setHeader(
-        'user-agent',
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15',
-      );
+      proxyReq.setHeader('referer', 'https://www.bilibili.com');
+      proxyReq.setHeader('user-agent', appConfig.agent);
     },
     proxyRes: (proxyRes) => {
       proxyRes.headers['content-type'] = 'audio/mp4';
