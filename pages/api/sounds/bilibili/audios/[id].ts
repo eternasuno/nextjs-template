@@ -23,6 +23,7 @@ const proxyMiddleware = createProxyMiddleware<NextApiRequest, NextApiResponse>({
         `bilibili_audio_path_${id}`,
         async () => await getAudioPath(id!),
         appConfig.cache.lastingExpire,
+        false,
       );
     } catch (error: any) {
       console.warn(error.message);

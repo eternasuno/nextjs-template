@@ -25,6 +25,7 @@ const proxyMiddleware = createProxyMiddleware<NextApiRequest, NextApiResponse>({
         `bilibili_video_path_${bvid}_${cid}`,
         async () => await getVideoPath(bvid, cid),
         appConfig.cache.lastingExpire,
+        false,
       );
     } catch (error: any) {
       console.warn(error.message);
