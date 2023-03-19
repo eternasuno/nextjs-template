@@ -24,13 +24,13 @@ const handler = async (req: NextApiRequest) => {
     subVideoList,
   } = video;
 
-  const feedItemList = subVideoList.map((sub, index) => {
-    const { id: cid, name, duration } = sub;
+  const feedItemList = subVideoList.map((sub) => {
+    const { id: cid, index, name, duration } = sub;
 
     return {
       title: name,
       description,
-      url: `https://www.bilibili.com/video/${bvid}?p=${index + 1}`,
+      url: `https://www.bilibili.com/video/${bvid}?p=${index}`,
       pubDate,
       enclosure_url: `https://${host}/api/sounds/bilibili/videos/${bvid}/${cid}`,
       enclosure_type: 'audio/mp4',

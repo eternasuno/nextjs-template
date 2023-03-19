@@ -7,6 +7,7 @@ export type User = {
 
 export type SubVideo = {
   id: string;
+  index: number;
   name: string;
   duration: number;
 };
@@ -74,20 +75,23 @@ export const getVideoInfo = async (id: string) => {
 
   const data = await get(url);
 
-  const subVideoList = (data.pages as any[]).map((item) => {
-    return {
-      id: item.cid,
-      name: item.part,
-      duration: item.duration,
-    } as SubVideo;
-  });
+  const subVideoList = (data.pages as any[])
+    .map((item) => {
+      return {
+        id: item.cid,
+        index: item.page,
+        name: item.part,
+        duration: item.duration,
+      } as SubVideo;
+    })
+    .reverse();
 
   return {
     id,
     name: data.title,
     author: data.owner.name,
     image: data.pic,
-    pubDate: new Date(data.pubDate * 1000),
+    pubDate: new Date(parseInt(data.pubdate) * 1000),
     description: data.desc,
     subVideoList,
   } as Video;
