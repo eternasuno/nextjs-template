@@ -1,19 +1,16 @@
-import { default as createNoCache } from '@/lib/cache/no';
-import { default as createRedisCache } from '@/lib/cache/redis';
+import createRedisCache from '@/lib/cache/redis';
 import config from '@/lib/config';
 import { md5 } from '@/lib/crypto';
-
-export type Cache = {
-  get: (..._: any) => Promise<string | null> | null;
-  set: (..._: any) => Promise<void> | null;
-};
 
 const createCache = () => {
   switch (config.cache.type) {
     case 'redis':
-      return createRedisCache(config.redis.uri!, config.cache.expire);
+      if (!config.redis.uri) {
+        throw Error('redis uri can not be empty!');
+      }
+      return createRedisCache(config.redis.uri, config.cache.expire);
     default:
-      return createNoCache();
+      return { get: () => null, set: () => null };
   }
 };
 
