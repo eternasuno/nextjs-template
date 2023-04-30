@@ -55,7 +55,7 @@ export const buildXml = (feed: Feed) => {
       description: description || title,
       url,
       guid: md5(url),
-      date: item.pubDate || now,
+      date: pubDate || now,
       enclosure: {
         url: enclosure_url,
         type: enclosure_type,

@@ -1,9 +1,9 @@
 import {
-  getSeasonInfo,
+  Audio,
+  getAudioInfo,
+  getSubAUIdList,
   getUserInfo,
-  getVideoInfo,
   User,
-  Video,
 } from '@/lib/bilibili';
 import tryGet from '@/lib/cache';
 import config from '@/lib/config';
@@ -13,56 +13,56 @@ import { NextApiRequest } from 'next';
 
 const handler = async (req: NextApiRequest) => {
   const uid = req.query.uid as string;
-  const sid = req.query.sid as string;
   const host = req.headers.host;
   const limit =
     typeof req.query.limit === 'string'
       ? parseInt(req.query.limit)
       : config.limit;
 
-  const [user, season] = await Promise.all([
+  const [user, auidList] = await Promise.all([
     tryGet<User>(
       `bilibili_user_${uid}`,
       async () => await getUserInfo(uid),
       config.cache.lastingExpire,
     ),
-    getSeasonInfo(sid, limit),
+    getSubAUIdList(uid, limit),
   ]);
 
-  const videoList = await Promise.all(
-    season.bvidList.map(async (bvid) => {
-      return await tryGet<Video>(
-        `bilibili_video_${bvid}`,
+  const audioList = await Promise.all(
+    auidList.map(async (auid) => {
+      return await tryGet<Audio>(
+        `bilibili_audio_${auid}`,
         async () => {
-          return getVideoInfo(bvid);
+          return getAudioInfo(auid);
         },
         config.cache.lastingExpire,
       );
     }),
   );
 
-  const feedItemList = videoList.map((video) => {
-    const { id: bvid, name, description, pubDate, image } = video;
-    const { id: cid, duration } = video.subVideoList[0];
+  const feedItemList = audioList.map((audio) => {
+    const { id, name, image, duration, pubDate, description } = audio;
 
     return {
       title: name,
       description,
-      url: `https://www.bilibili.com/video/${bvid}`,
+      url: `https://www.bilibili.com/audio/au${id}`,
       pubDate,
-      enclosure_url: `https://${host}/api/sounds/bilibili/videos/${bvid}/${cid}`,
+      enclosure_url: `https://${host}/sounds/bilibili/audios/${id}`,
       enclosure_type: 'audio/mp4',
       duration,
       image,
     } as FeedItem;
   });
 
+  const { name, description, image } = user;
+
   return {
-    title: season.name,
-    author: user.name,
-    description: season.description || user.description,
-    url: `https://space.bilibili.com/${uid}/channel/collectiondetail?sid=${sid}`,
-    image: season.image,
+    title: `${name}的音频投稿`,
+    author: name,
+    description,
+    url: `https://space.bilibili.com/${uid}/audio`,
+    image,
     items: feedItemList,
   } as Feed;
 };

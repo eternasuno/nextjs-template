@@ -21,7 +21,7 @@ const proxyMiddleware = createProxyMiddleware<NextApiRequest, NextApiResponse>({
       const id = req.query.id as string;
       return tryGet(
         `bilibili_audio_path_${id}`,
-        async () => await getAudioPath(id!),
+        async () => await getAudioPath(id),
         appConfig.cache.lastingExpire,
         false,
       );
@@ -46,7 +46,7 @@ const proxyMiddleware = createProxyMiddleware<NextApiRequest, NextApiResponse>({
 });
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  proxyMiddleware(req, res, (result: unknown) => {
+  proxyMiddleware(req, res, (result: any) => {
     if (result instanceof Error) {
       throw result;
     }

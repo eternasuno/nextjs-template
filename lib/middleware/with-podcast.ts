@@ -5,8 +5,12 @@ import { NextApiHandler, NextApiRequest, NextApiResponse } from 'next';
 const withPodcast =
   (handler: NextApiHandler) =>
   async (req: NextApiRequest, res: NextApiResponse) => {
+    if (!req.url) {
+      return;
+    }
+
     try {
-      const podcast = await tryGet(req.url!, async () => {
+      const podcast = await tryGet(req.url, async () => {
         const feed = await handler(req, res);
         return buildXml(feed as Feed);
       });

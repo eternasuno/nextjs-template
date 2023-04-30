@@ -48,7 +48,7 @@ const proxyMiddleware = createProxyMiddleware<NextApiRequest, NextApiResponse>({
 });
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
-  proxyMiddleware(req, res, (result: unknown) => {
+  proxyMiddleware(req, res, (result: any) => {
     if (result instanceof Error) {
       throw result;
     }

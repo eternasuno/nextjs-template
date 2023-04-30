@@ -1,4 +1,3 @@
-import { Cache } from '@/lib/cache';
 import Redis from 'ioredis';
 
 const createCache = (url: string, defaultTtl: number) => {
@@ -49,7 +48,7 @@ const createCache = (url: string, defaultTtl: number) => {
     redis.set(key, value, 'EX', maxAge);
   };
 
-  return { get, set } as Cache;
+  return { get, set };
 };
 
 const getCacheTtlKey = (key: string) => {
