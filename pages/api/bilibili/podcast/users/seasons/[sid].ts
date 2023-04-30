@@ -50,7 +50,7 @@ const handler = async (req: NextApiRequest) => {
       description,
       url: `https://www.bilibili.com/video/${bvid}`,
       pubDate,
-      enclosure_url: `https://${host}/sounds/bilibili/videos/${bvid}/${cid}`,
+      enclosure_url: `https://${host}/bilibili/sounds/videos/${bvid}/${cid}`,
       enclosure_type: 'audio/mp4',
       duration,
       image,

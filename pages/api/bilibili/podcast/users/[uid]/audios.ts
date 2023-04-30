@@ -48,7 +48,7 @@ const handler = async (req: NextApiRequest) => {
       description,
       url: `https://www.bilibili.com/audio/au${id}`,
       pubDate,
-      enclosure_url: `https://${host}/sounds/bilibili/audios/${id}`,
+      enclosure_url: `https://${host}/bilibili/sounds/audios/${id}`,
       enclosure_type: 'audio/mp4',
       duration,
       image,
