@@ -6,7 +6,7 @@ const proxySound = (): Middleware => async (ctx, next) => {
     const { url, header } = ctx;
     const path = await tryGet(url, next);
 
-    const headers = new Headers();
+    const headers = new Headers({ Referer: 'https://www.bilibili.com' });
     for (const key in header) {
         if (
             Object.prototype.hasOwnProperty.call(header, key) &&
