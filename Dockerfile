@@ -5,5 +5,4 @@ COPY . .
 
 EXPOSE 80
 
-RUN yarn install & \
-    yarn start
+RUN yarn && yarn start
