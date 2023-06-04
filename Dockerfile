@@ -5,4 +5,6 @@ COPY . .
 
 EXPOSE 80
 
-RUN yarn && yarn start
+RUN yarn
+
+CMD sh -c 'yarn start'
