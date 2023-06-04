@@ -2,6 +2,9 @@
     "name": "koa-template",
     "version": "1.0.0",
     "description": "A koa template with typescript",
+    "engines": {
+        "node": "^18.16.0"
+    },
     "scripts": {
         "build": "del-cli --force dist && tsc",
         "start": "npm run build && NODE_ENV=production node ./dist/app.js",
