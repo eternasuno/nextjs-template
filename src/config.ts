@@ -14,8 +14,8 @@ dotenv.config({ path: dotenvPath });
 const { HOST_NAME, PORT, CACHE_TYPE, CACHE_EXPIRE, REDIS_URI } = env;
 
 const config = {
-    hostname: HOST_NAME,
-    port: PORT,
+    hostname: HOST_NAME || '127.0.0.1',
+    port: PORT || '3000',
     cache: {
         type: CACHE_TYPE,
         expire: CACHE_EXPIRE ? parseInt(CACHE_EXPIRE) : 300,
