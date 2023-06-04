@@ -3,7 +3,7 @@
     "version": "1.0.0",
     "description": "A koa template with typescript",
     "engines": {
-        "node": "^18.16.0"
+        "node": "^18.0.0"
     },
     "scripts": {
         "build": "del-cli --force dist && tsc",
