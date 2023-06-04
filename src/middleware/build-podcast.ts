@@ -7,11 +7,10 @@ const buildPodcast = (): Middleware => async (ctx, next) => {
     const {
         url,
         host,
-        protocol,
         query: { limit: _limit },
     } = ctx;
     ctx.state.limit = parseInt(String(_limit)) || config.bilibili.limit;
-    ctx.state.soundsUrl = `${protocol}://${host}/bilibili/sounds`;
+    ctx.state.soundsUrl = `https://${host}/bilibili/sounds`;
 
     const podcast = await tryGet(url, async () => {
         const feed = await next();
