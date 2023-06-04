@@ -4,7 +4,7 @@
     "description": "A koa template with typescript",
     "scripts": {
         "build": "del-cli --force dist && tsc",
-        "start": "npm run build && NODE_ENV=production node ./dist/app.js",
+        "start": "NODE_ENV=production node ./dist/app.js",
         "dev": "NODE_ENV=development nodemon src/app.ts",
         "lint": "eslint --fix src",
         "prettier": "prettier --write src"
