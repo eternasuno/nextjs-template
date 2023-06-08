@@ -25,6 +25,14 @@ export type Video = {
     subVideoList: SubVideo[];
 };
 
+export type Season = {
+    id: string;
+    name: string;
+    image: string;
+    description: string;
+    bvidList: string[];
+};
+
 export const getUserInfo = async (id: string) => {
     const url = new URL('https://api.bilibili.com/x/space/wbi/acc/info');
     url.searchParams.append('mid', id);
@@ -81,6 +89,29 @@ export const getVideoInfo = async (id: string) => {
         description: data.desc,
         subVideoList,
     } as Video;
+};
+
+export const getSeasonInfo = async (id: string, limit: number) => {
+    const url = new URL(
+        'https://api.bilibili.com/x/polymer/space/seasons_archives_list'
+    );
+    url.searchParams.append('mid', '1');
+    url.searchParams.append('season_id', id);
+    url.searchParams.append('sort_reverse', 'true');
+    url.searchParams.append('page_num', '1');
+    url.searchParams.append('page_size', String(limit));
+
+    const { archives, meta } = await getApi(url);
+
+    return {
+        id,
+        name: meta?.name,
+        image: meta?.cover,
+        description: meta?.description,
+        bvidList: Array.isArray(archives)
+            ? archives.map((archive) => archive.bvid as string)
+            : [],
+    } as Season;
 };
 
 export const getVideoPath = async (bvid: string, cid: string) => {

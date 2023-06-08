@@ -4,8 +4,8 @@ import sounds from './sounds';
 
 const router = new Router();
 
-router.use('/podcast', podcast.routes(), sounds.allowedMethods());
+router.use('/podcast', podcast.routes()).use(podcast.allowedMethods());
 
-router.use('/sounds', sounds.routes(), sounds.allowedMethods());
+router.use('/sounds', sounds.routes()).use(sounds.allowedMethods());
 
 export default router;

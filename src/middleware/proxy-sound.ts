@@ -1,10 +1,11 @@
 import { Middleware } from 'koa';
-import tryGet from '../lib/cache';
 import { Readable } from 'stream';
+import config from '../config';
+import tryGet from '../lib/cache';
 
 const proxySound = (): Middleware => async (ctx, next) => {
     const { url, header } = ctx;
-    const path = await tryGet(url, next);
+    const path = await tryGet(url, next, config.cache.lasting_expire);
 
     const headers = new Headers({ Referer: 'https://www.bilibili.com' });
     for (const key in header) {
@@ -29,7 +30,6 @@ const proxySound = (): Middleware => async (ctx, next) => {
         ctx.set(key, value);
     });
 
-    ctx.type = response.headers.get('content-type') || 'audio/mp4';
     ctx.status = response.status;
     ctx.body = Readable.fromWeb(response.body as any);
 };
