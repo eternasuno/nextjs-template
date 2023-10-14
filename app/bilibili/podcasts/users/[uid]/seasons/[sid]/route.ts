@@ -39,7 +39,7 @@ export const GET = withPodcast<{ params: { uid: string; sid: string } }>(
                 return {
                     description,
                     duration,
-                    enclosure_type: 'audio/mp4',
+                    enclosure_type: 'video/mp4',
                     enclosure_url: `${domain}/bilibili/sounds/${bvid}/${cid}`,
                     image,
                     pubDate,
