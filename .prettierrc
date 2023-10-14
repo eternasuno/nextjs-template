@@ -1,7 +1,15 @@
 {
+    "arrowParens": "always",
     "bracketSameLine": true,
-    "printWidth": 80,
+    "bracketSpacing": true,
+    "embeddedLanguageFormatting": "auto",
+    "endOfLine": "lf",
+    "htmlWhitespaceSensitivity": "css",
+    "printWidth": 85,
+    "quoteProps": "as-needed",
+    "semi": true,
     "singleQuote": true,
     "tabWidth": 4,
-    "trailingComma": "es5"
+    "trailingComma": "es5",
+    "useTabs": false
 }

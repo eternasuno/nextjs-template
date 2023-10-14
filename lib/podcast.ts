@@ -26,16 +26,16 @@ export const buildXml = (feed: Feed) => {
     const { title, description, url, image, author } = feed;
 
     const feedOptions = {
-        title,
         description: description || title,
-        siteUrl: url,
         imageUrl: image,
-        pubDate: now,
         itunesAuthor: author,
         itunesImage: image,
         itunesOwner: {
             name: author,
         },
+        pubDate: now,
+        siteUrl: url,
+        title,
     } as FeedOptions;
 
     const itemList = feed.items.map((item) => {
@@ -51,18 +51,18 @@ export const buildXml = (feed: Feed) => {
         } = item;
 
         return {
-            title,
-            description: description || title,
-            url,
-            guid: md5(url),
             date: pubDate || now,
+            description: description || title,
             enclosure: {
-                url: enclosure_url,
                 type: enclosure_type,
+                url: enclosure_url,
             },
+            guid: md5(url),
             itunesDuration: duration,
             itunesImage: image,
             itunesTitle: title,
+            title,
+            url,
         } as Item;
     });
 

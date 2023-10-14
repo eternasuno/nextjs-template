@@ -1,12 +1,19 @@
 {
     "extends": [
-        "eslint:recommended",
-        "plugin:@typescript-eslint/recommended",
+        "next/core-web-vitals",
+        "plugin:@next/next/recommended",
         "plugin:prettier/recommended"
     ],
-    "parser": "@typescript-eslint/parser",
-    "plugins": ["@typescript-eslint"],
+    "plugins": ["sort-keys-fix"],
     "rules": {
-        "@typescript-eslint/no-explicit-any": "off"
+        "complexity": ["error", { "max": 10 }],
+        "max-depth": ["error", { "max": 4 }],
+        "max-len": ["error", { "code": 300 }],
+        "max-lines": ["error", { "max": 500 }],
+        "max-lines-per-function": ["error", { "max": 50 }],
+        "no-console": ["warn", { "allow": ["info", "warn", "error"] }],
+        "no-empty-function": "error",
+        "no-unused-vars": "error",
+        "sort-keys-fix/sort-keys-fix": ["error", "asc", { "natural": true }]
     }
 }

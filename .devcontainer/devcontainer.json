@@ -1,11 +1,4 @@
 {
-    "image": "mcr.microsoft.com/devcontainers/base:debian",
-    "features": {
-        "ghcr.io/devcontainers/features/node": {
-            "version": "lts",
-            "nodeGypDependencies": true
-        }
-    },
     "customizations": {
         "vscode": {
             "extensions": [
@@ -15,5 +8,13 @@
                 "rangav.vscode-thunder-client"
             ]
         }
-    }
+    },
+    "features": {
+        "ghcr.io/devcontainers/features/node": {
+            "nodeGypDependencies": true,
+            "version": "lts"
+        }
+    },
+    "image": "mcr.microsoft.com/devcontainers/base:debian",
+    "postStartCommand": "yarn install"
 }
