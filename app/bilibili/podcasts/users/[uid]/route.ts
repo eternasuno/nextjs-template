@@ -1,4 +1,4 @@
-import { getUserInfo, getVideoList } from '@/lib/bilibili';
+import { getSubBVIdList, getUserInfo, getVideoInfo } from '@/lib/bilibili';
 import cache from '@/lib/cache';
 import config from '@/lib/config';
 import { withPodcast } from '@/lib/middlewares';
@@ -8,15 +8,26 @@ export const GET = withPodcast<{ params: { uid: string } }>(
         const { protocol, host, searchParams } = new URL(request.url);
         const domain = `${protocol}//${host}`;
         const limit = Number(searchParams.get('limit')) || config.feed.items_limit;
+        const keyword = searchParams.get('keyword') || undefined;
 
-        const [user, videoList] = await Promise.all([
+        const [user, subVideoList] = await Promise.all([
             cache.wrap(
                 `bilibili_user_${uid}`,
                 async () => getUserInfo(uid),
                 config.cache.lasting_expire
             ),
-            getVideoList(uid, limit),
+            getSubBVIdList(uid, limit, keyword),
         ]);
+
+        const videoList = await Promise.all(
+            subVideoList.map(async (bvid) =>
+                cache.wrap(
+                    `bilibili_video_${bvid}`,
+                    async () => getVideoInfo(bvid),
+                    config.cache.lasting_expire
+                )
+            )
+        );
 
         const { name, description, image } = user;
 
@@ -39,7 +50,7 @@ export const GET = withPodcast<{ params: { uid: string } }>(
                     url: `https://www.bilibili.com/video/${bvid}`,
                 };
             }),
-            title: `${name}的视频投稿`,
+            title: `${keyword || '视频'} | ${name}`,
             url: `https://space.bilibili.com/${uid}/video`,
         };
     }

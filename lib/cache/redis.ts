@@ -10,7 +10,6 @@ const createCache = async () => {
 
     const match = /:\/\/\S*@(\S+):\d+/.exec(config.redis.url);
     const servername = (match && match.at(1)) || undefined;
-    console.info(servername);
 
     return caching(
         redisInsStore(

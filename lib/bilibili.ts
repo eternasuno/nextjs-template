@@ -48,24 +48,15 @@ export const getUserInfo = async (id: string) => {
     } as User;
 };
 
-export const getVideoList = async (id: string, limit: number) => {
-    const bvidList = await getSubBVIdList(id, limit);
-
-    return Promise.all(
-        bvidList.map(async (bvid) =>
-            cache.wrap(
-                `bilibili_video_${bvid}`,
-                async () => getVideoInfo(bvid),
-                config.cache.lasting_expire
-            )
-        )
-    );
-};
-
-const getSubBVIdList = async (id: string, limit: number) => {
+export const getSubBVIdList = async (
+    id: string,
+    limit: number,
+    keyword?: string
+) => {
     const url = new URL('https://api.bilibili.com/x/space/wbi/arc/search');
     url.searchParams.append('mid', id);
     url.searchParams.append('ps', String(limit));
+    keyword && url.searchParams.append('keyword', keyword);
 
     const {
         list: { vlist },
@@ -112,16 +103,18 @@ export const getSeasonInfo = async (id: string, limit: number) => {
     );
     url.searchParams.append('mid', '1');
     url.searchParams.append('season_id', id);
-    url.searchParams.append('sort_reverse', 'true');
     url.searchParams.append('page_num', '1');
-    url.searchParams.append('page_size', String(limit));
+    url.searchParams.append('page_size', '99');
 
     const { archives, meta } = await getApi(url);
 
+    const bvidList = (archives as Array<{ bvid: string; pubdate: number }>)
+        .sort((a, b) => b.pubdate - a.pubdate)
+        .slice(0, limit)
+        .map((archive) => archive.bvid);
+
     return {
-        bvidList: Array.isArray(archives)
-            ? archives.map((archive) => archive.bvid as string)
-            : [],
+        bvidList,
         description: meta?.description,
         id,
         image: meta?.cover,
