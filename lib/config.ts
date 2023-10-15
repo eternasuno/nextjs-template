@@ -13,7 +13,7 @@ const config = {
         expire: CACHE_EXPIRE ? parseInt(CACHE_EXPIRE) * 1000 : 5 * 60 * 1000,
         lasting_expire: CACHE_LASTING_EXPIRE
             ? parseInt(CACHE_LASTING_EXPIRE) * 1000
-            : 24 * 60 * 60 * 1000,
+            : 12 * 60 * 60 * 1000,
         type: CACHE_TYPE || 'memory',
     },
     feed: {
