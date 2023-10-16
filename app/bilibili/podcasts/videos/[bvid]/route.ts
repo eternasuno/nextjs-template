@@ -1,5 +1,4 @@
 import { getVideoInfo } from '@/lib/bilibili';
-import cache from '@/lib/cache';
 import config from '@/lib/config';
 import { withPodcast } from '@/lib/middlewares';
 
