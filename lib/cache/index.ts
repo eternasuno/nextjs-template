@@ -1,5 +1,15 @@
 import config from '../config';
-import memory from './memory';
-import redis from './redis';
+import createMemoryCache from './memory';
+import createRedisCache from './redis';
+import createVercelKVCache from './vercel-KV';
 
-export default config.cache.type === 'redis' ? await redis() : await memory();
+export default await (() => {
+    switch (config.cache.type) {
+        case 'redis':
+            return createRedisCache();
+        case 'vercel_KV':
+            return createVercelKVCache();
+        default:
+            return createMemoryCache();
+    }
+})();

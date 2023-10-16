@@ -8,20 +8,10 @@ const createCache = async () => {
         throw new Error('environment variable `REDIS_URL` can not be empty.');
     }
 
-    const match = /:\/\/\S*@(\S+):\d+/.exec(config.redis.url);
-    const servername = (match && match.at(1)) || undefined;
-
     return caching(
-        redisInsStore(
-            new Redis(config.redis.url, {
-                tls: {
-                    servername,
-                },
-            }),
-            {
-                ttl: config.cache.expire,
-            }
-        )
+        redisInsStore(new Redis(config.redis.url), {
+            ttl: config.cache.expire,
+        })
     );
 };
 
