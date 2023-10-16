@@ -9,10 +9,7 @@ export const GET = withPodcast<{ params: { bvid: string } }>(
         const domain = `${protocol}//${host}`;
         const limit = Number(searchParams.get('limit')) || config.feed.items_limit;
 
-        const video = await cache.wrap(
-            `bilibili_video_${bvid}`,
-            async () => await getVideoInfo(bvid)
-        );
+        const video = await getVideoInfo(bvid);
 
         const {
             name: videoName,
