@@ -104,7 +104,7 @@ export const getSeasonInfo = async (id: string, limit: number) => {
     url.searchParams.append('mid', '1');
     url.searchParams.append('season_id', id);
     url.searchParams.append('page_num', '1');
-    url.searchParams.append('page_size', `${limit > 200 ? limit : 200}`);
+    url.searchParams.append('page_size', `${limit > 100 ? limit : 100}`);
 
     const { archives, meta } = await getApi(url);
 
