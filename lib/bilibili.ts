@@ -104,14 +104,16 @@ export const getSeasonInfo = async (id: string, limit: number) => {
     url.searchParams.append('mid', '1');
     url.searchParams.append('season_id', id);
     url.searchParams.append('page_num', '1');
-    url.searchParams.append('page_size', `${limit > 100 ? limit : 100}`);
+    url.searchParams.append('page_size', '1');
+    const { meta } = await getApi(url);
 
-    const { archives, meta } = await getApi(url);
-
-    const bvidList = (archives as Array<{ bvid: string; pubdate: number }>)
-        .sort((a, b) => b.pubdate - a.pubdate)
-        .slice(0, limit)
-        .map((archive) => archive.bvid);
+    const bvidList =
+        meta.total > 0
+            ? (await getSeasonVideoList(id, meta.total))
+                  .sort((a, b) => b.pubdate - a.pubdate)
+                  .slice(0, limit)
+                  .map((archive) => archive.bvid)
+            : [];
 
     return {
         bvidList,
@@ -134,6 +136,28 @@ export const getVideoPath = async (bvid: string, cid: string) => {
 
     return path as string;
 };
+
+const getSeasonVideoList = async (id: string, total: number) =>
+    (
+        await Promise.all(
+            Array.from(
+                { length: Math.ceil(total / 99) },
+                (_, index) => index + 1
+            ).map(async (page) => {
+                const url = new URL(
+                    'https://api.bilibili.com/x/polymer/space/seasons_archives_list'
+                );
+                url.searchParams.append('mid', '1');
+                url.searchParams.append('season_id', id);
+                url.searchParams.append('page_num', String(page));
+                url.searchParams.append('page_size', '99');
+
+                const { archives } = await getApi(url);
+
+                return archives as Array<{ bvid: string; pubdate: number }>;
+            })
+        )
+    ).reduce((acc, item) => acc.concat(item), []);
 
 const getApi = async (url: URL) => {
     const signedUrl = await signSearch(url);
