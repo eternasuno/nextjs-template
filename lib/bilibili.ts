@@ -56,6 +56,7 @@ export const getSubBVIdList = async (
     const url = new URL('https://api.bilibili.com/x/space/wbi/arc/search');
     url.searchParams.append('mid', id);
     url.searchParams.append('ps', String(limit));
+    url.searchParams.append('dm_cover_img_str', 'bm8gd2ViZ2');
     keyword && url.searchParams.append('keyword', keyword);
 
     const {
