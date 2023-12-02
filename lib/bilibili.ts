@@ -56,6 +56,8 @@ export const getSubBVIdList = async (
     const url = new URL('https://api.bilibili.com/x/space/wbi/arc/search');
     url.searchParams.append('mid', id);
     url.searchParams.append('ps', String(limit));
+    url.searchParams.append('dm_img_list', '[]');
+    url.searchParams.append('dm_img_str', 'bm8gd2ViZ2');
     url.searchParams.append('dm_cover_img_str', 'bm8gd2ViZ2');
     keyword && url.searchParams.append('keyword', keyword);
 
@@ -189,10 +191,14 @@ const signSearch = async (url: URL) => {
 };
 
 const getWbiSalt = async () => {
-    const [originalSalt, mixinKeyEncTab] = await Promise.all([
-        getOriginalSalt(),
-        getMixinKeyEncTab(),
-    ]);
+    const originalSalt = await getOriginalSalt();
+
+    const mixinKeyEncTab = [
+        46, 47, 18, 2, 53, 8, 23, 32, 15, 50, 10, 31, 58, 3, 45, 35, 27, 43, 5, 49,
+        33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13, 37, 48, 7, 16, 24, 55, 40, 61,
+        26, 17, 0, 1, 60, 51, 30, 4, 22, 25, 54, 21, 56, 59, 6, 63, 57, 62, 11, 36,
+        20, 34, 44, 52,
+    ];
 
     return mixinKeyEncTab
         .splice(0, 32)
@@ -208,18 +214,6 @@ const getOriginalSalt = async (): Promise<string> => {
     } = await (await get('https://api.bilibili.com/x/web-interface/nav')).json();
 
     return img_url.split(/[./]/).at(-2) + sub_url.split(/[./]/).at(-2);
-};
-
-const getMixinKeyEncTab = async () => {
-    const jsUrl = (await (await get('https://space.bilibili.com/1')).text())
-        .match(/[^"]*9.space[^"]*/)
-        ?.at(0);
-
-    const array = (await (await get(`https:${jsUrl}`)).text())
-        .match(/\[(?:\d+,){63}\d+\]/)
-        ?.at(0);
-
-    return array ? (JSON.parse(array) as Array<number>) : [];
 };
 
 export const get = async (url: URL | string) => {
