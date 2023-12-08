@@ -1,3 +1,4 @@
+import { randomUUID } from 'crypto';
 import cache from './cache';
 import config from './config';
 import { md5 } from './crypto';
@@ -58,7 +59,7 @@ export const getSubBVIdList = async (
     url.searchParams.append('ps', String(limit));
     url.searchParams.append('dm_img_list', '[]');
     url.searchParams.append('dm_img_str', 'bm8gd2ViZ2');
-    url.searchParams.append('dm_cover_img_str', 'bm8gd2ViZ2');
+    url.searchParams.append('dm_cover_img_str', btoa(randomUUID()).slice(0, -2));
     keyword && url.searchParams.append('keyword', keyword);
 
     const {
