@@ -1,8 +1,7 @@
 import { getVideoPath } from '@/lib/bilibili';
-import { withSound } from '@/lib/middlewares';
+import { type NextRequest, NextResponse } from 'next/server';
 
-export const GET = withSound<{ params: { bvid: string; cid: string } }>(
-    (request, { params: { bvid, cid } }) => {
-        return getVideoPath(bvid, cid);
-    }
-);
+export const GET = async (
+  _: NextRequest,
+  { params: { bvid, cid } }: { params: { bvid: string; cid: string } },
+) => NextResponse.redirect(await getVideoPath(bvid, cid), 302);

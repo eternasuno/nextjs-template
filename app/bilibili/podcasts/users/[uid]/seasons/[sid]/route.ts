@@ -1,54 +1,37 @@
-import { getSeasonInfo, getUserInfo, getVideoInfo } from '@/lib/bilibili';
-import cache from '@/lib/cache';
-import config from '@/lib/config';
-import { withPodcast } from '@/lib/middlewares';
+import { getSeasonInfo, getSeasonVideoList, getUserInfo } from '@/lib/bilibili';
+import withPodcast from '@/lib/podcast';
+import { env } from 'process';
 
-export const GET = withPodcast<{ params: { uid: string; sid: string } }>(
-    async (request, { params: { uid, sid } }) => {
-        const { protocol, host, searchParams } = new URL(request.url);
-        const domain = `${protocol}//${host}`;
-        const limit = Number(searchParams.get('limit')) || config.feed.items_limit;
+const MAX_FEED_ITEMS = Number(env.MAX_FEED_ITEMS || 12);
 
-        const [user, season] = await Promise.all([
-            cache.wrap(
-                `bilibili_user_${uid}`,
-                async () => getUserInfo(uid),
-                config.cache.lasting_expire
-            ),
-            getSeasonInfo(sid, limit),
-        ]);
+export const GET = withPodcast(async (url, uid, sid) => {
+  const { protocol, host, searchParams } = new URL(url);
+  const domain = `${protocol}//${host}`;
+  const limit = Number(searchParams.get('limit') || MAX_FEED_ITEMS);
 
-        const videoList = await Promise.all(
-            season.bvidList.map(async (bvid) =>
-                cache.wrap(
-                    `bilibili_video_${bvid}`,
-                    async () => getVideoInfo(bvid),
-                    config.cache.lasting_expire
-                )
-            )
-        );
+  const [user, season] = await Promise.all([getUserInfo(uid), getSeasonInfo(sid)]);
+  const videoList = await getSeasonVideoList(sid, season.total, limit);
 
-        return {
-            author: user.name,
-            description: season.description || user.description,
-            image: season.image || user.image,
-            items: videoList.map((video) => {
-                const { id: bvid, name, description, pubDate, image } = video;
-                const { id: cid, duration } = video.subVideoList[0];
+  return {
+    author: user.name,
+    description: season.description || user.description,
+    image: season.image || user.image,
+    items: videoList.map((video) => {
+      const { id: bvid, name, description, pubDate, image } = video;
+      const { id: cid, duration } = video.subVideoList[0];
 
-                return {
-                    description,
-                    duration,
-                    enclosure_type: 'video/mp4',
-                    enclosure_url: `${domain}/bilibili/sounds/${bvid}/${cid}`,
-                    image,
-                    pubDate,
-                    title: name,
-                    url: `https://www.bilibili.com/video/${bvid}`,
-                };
-            }),
-            title: season.name,
-            url: `https://space.bilibili.com/${uid}/channel/collectiondetail?sid=${sid}`,
-        };
-    }
-);
+      return {
+        description,
+        duration,
+        enclosure_type: 'video/mp4',
+        enclosure_url: `${domain}/bilibili/sounds/${bvid}/${cid}`,
+        image,
+        pubDate,
+        title: name,
+        url: `https://www.bilibili.com/video/${bvid}`,
+      };
+    }),
+    title: season.name,
+    url: `https://space.bilibili.com/${uid}/channel/collectiondetail?sid=${sid}`,
+  };
+});

@@ -4,8 +4,8 @@
             "extensions": [
                 "dbaeumer.vscode-eslint",
                 "eamodio.gitlens",
-                "esbenp.prettier-vscode",
-                "rangav.vscode-thunder-client"
+                "rangav.vscode-thunder-client",
+                "biomejs.biome"
             ]
         }
     },

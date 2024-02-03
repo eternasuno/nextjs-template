@@ -1,38 +1,37 @@
 {
-    "[css]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
+  "[javascript]": {
+    "editor.codeActionsOnSave": {
+      "quickfix.biome": true,
+      "source.organizeImports.biome": true
     },
-    "[html]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[json]": {
+    "editor.codeActionsOnSave": {
+      "quickfix.biome": true,
+      "source.organizeImports.biome": true
     },
-    "[javascript]": {
-        "editor.codeActionsOnSave": {
-            "source.fixAll": "explicit",
-            "source.organizeImports": "explicit"
-        },
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[jsonc]": {
+    "editor.codeActionsOnSave": {
+      "quickfix.biome": true,
+      "source.organizeImports.biome": true
     },
-    "[json]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescript]": {
+    "editor.codeActionsOnSave": {
+      "quickfix.biome": true,
+      "source.organizeImports.biome": true
     },
-    "[jsonc]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+  "[typescriptreact]": {
+    "editor.codeActionsOnSave": {
+      "quickfix.biome": true,
+      "source.organizeImports.biome": true
     },
-    "[postcss]": {
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[typescript]": {
-        "editor.codeActionsOnSave": {
-            "source.fixAll": "explicit",
-            "source.organizeImports": "explicit"
-        },
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    },
-    "[typescriptreact]": {
-        "editor.codeActionsOnSave": {
-            "source.fixAll": "explicit",
-            "source.organizeImports": "explicit"
-        },
-        "editor.defaultFormatter": "esbenp.prettier-vscode"
-    }
+    "editor.defaultFormatter": "biomejs.biome"
+  }
 }
