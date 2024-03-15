@@ -1,6 +1,6 @@
+import { env } from 'node:process';
 import { getUserInfo, getUserVideoList } from '@/lib/bilibili';
 import withPodcast from '@/lib/podcast';
-import { env } from 'process';
 
 const MAX_FEED_ITEMS = Number(env.MAX_FEED_ITEMS || 12);
 

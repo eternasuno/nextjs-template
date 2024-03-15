@@ -1,5 +1,5 @@
+import { env } from 'node:process';
 import { revalidateTag, unstable_cache } from 'next/cache';
-import { env } from 'process';
 
 const TRANSIENT_CACHE_EXPIRE = Number(env.TRANSIENT_CACHE_EXPIRE || 300);
 const MEDIUM_CACHE_EXPIRE = Number(env.MEDIUM_CACHE_EXPIRE || 3600);

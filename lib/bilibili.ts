@@ -46,10 +46,6 @@ export const getUserVideoList = async (id: string, limit: number, keyword?: stri
   const url = new URL('https://api.bilibili.com/x/space/wbi/arc/search');
   url.searchParams.append('mid', id);
   url.searchParams.append('ps', String(limit));
-  url.searchParams.append('dm_img_list', '[]');
-  url.searchParams.append('dm_img_str', randomUpperCase(2));
-  url.searchParams.append('dm_cover_img_str', randomUpperCase(2));
-  url.searchParams.append('dm_img_inter', '{"ds":[],"wh":[0,0,0],"of":[0,0,0]}');
   keyword && url.searchParams.append('keyword', keyword);
 
   const {
@@ -136,7 +132,7 @@ const getVideoInfo = persistentCache('video', async (id: string) => {
     id,
     image: pic,
     name: title,
-    pubDate: new Date(parseInt(pubdate) * 1000),
+    pubDate: new Date(Number(pubdate) * 1000),
     subVideoList,
   } as Video;
 });
@@ -153,6 +149,10 @@ const getApi = async (url: URL) => {
 };
 
 const signSearch = async (url: URL) => {
+  url.searchParams.append('dm_img_list', '[]');
+  url.searchParams.append('dm_img_str', randomUpperCase(2));
+  url.searchParams.append('dm_cover_img_str', randomUpperCase(2));
+  url.searchParams.append('dm_img_inter', '{"ds":[],"wh":[0,0,0],"of":[0,0,0]}');
   url.searchParams.append('wts', String(Math.round(Date.now() / 1000)));
   url.searchParams.sort();
 
@@ -185,7 +185,7 @@ const get = async (url: URL | string) => {
   const response = await fetch(url, {
     headers: {
       'User-Agent':
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/16.3 Safari/605.1.15',
+        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
     },
   });
 
