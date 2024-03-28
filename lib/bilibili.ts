@@ -142,7 +142,7 @@ const getApi = async (url: URL) => {
   const { code, message, data } = await (await get(signedUrl)).json();
 
   if (code !== 0) {
-    throw new Error(message);
+    throw new Error(`${url.toString()}-${message}`);
   }
 
   return data;
@@ -183,10 +183,7 @@ const getWbiSalt = persistentCache('salt', async () => {
 
 const get = async (url: URL | string) => {
   const response = await fetch(url, {
-    headers: {
-      'User-Agent':
-        'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36',
-    },
+    headers: { 'User-Agent': 'Mozilla/5.0' },
   });
 
   if (!response.ok) {
