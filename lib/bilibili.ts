@@ -1,5 +1,6 @@
 import { mediumCache, persistentCache } from './cache';
-import { md5, randomUpperCase } from './crypto';
+import { getRandomUpperCase, md5 } from './crypto';
+import { getUserAgent } from './user-agents';
 
 export type User = {
   id: string;
@@ -142,7 +143,7 @@ const getApi = async (url: URL) => {
   const { code, message, data } = await (await get(signedUrl)).json();
 
   if (code !== 0) {
-    throw new Error(`${url.toString()}-${message}`);
+    throw new Error(`${url.pathname}-${message}`);
   }
 
   return data;
@@ -150,8 +151,8 @@ const getApi = async (url: URL) => {
 
 const signSearch = async (url: URL) => {
   url.searchParams.append('dm_img_list', '[]');
-  url.searchParams.append('dm_img_str', randomUpperCase(2));
-  url.searchParams.append('dm_cover_img_str', randomUpperCase(2));
+  url.searchParams.append('dm_img_str', getRandomUpperCase(2));
+  url.searchParams.append('dm_cover_img_str', getRandomUpperCase(2));
   url.searchParams.append('dm_img_inter', '{"ds":[],"wh":[0,0,0],"of":[0,0,0]}');
   url.searchParams.append('wts', String(Math.round(Date.now() / 1000)));
   url.searchParams.sort();
@@ -183,7 +184,9 @@ const getWbiSalt = persistentCache('salt', async () => {
 
 const get = async (url: URL | string) => {
   const response = await fetch(url, {
-    headers: { 'User-Agent': 'Mozilla/5.0' },
+    headers: {
+      'User-Agent': getUserAgent(),
+    },
   });
 
   if (!response.ok) {
