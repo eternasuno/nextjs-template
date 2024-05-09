@@ -186,10 +186,12 @@ const get = async (url: URL | string) => {
   const response = await fetch(url, {
     headers: {
       'User-Agent': getUserAgent(),
+      referer: 'https://space.bilibili.com',
     },
   });
 
   if (!response.ok) {
+    console.debug(url, response.status, response.statusText);
     throw new Error(response.statusText);
   }
 
