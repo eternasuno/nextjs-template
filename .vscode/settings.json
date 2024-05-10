@@ -1,37 +1,16 @@
 {
-  "[javascript]": {
-    "editor.codeActionsOnSave": {
-      "quickfix.biome": "explicit",
-      "source.organizeImports.biome": "explicit"
-    },
-    "editor.defaultFormatter": "biomejs.biome"
-  },
   "[json]": {
-    "editor.codeActionsOnSave": {
-      "quickfix.biome": "explicit",
-      "source.organizeImports.biome": "explicit"
-    },
-    "editor.defaultFormatter": "biomejs.biome"
+    "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "[jsonc]": {
-    "editor.codeActionsOnSave": {
-      "quickfix.biome": "explicit",
-      "source.organizeImports.biome": "explicit"
-    },
-    "editor.defaultFormatter": "biomejs.biome"
+    "editor.defaultFormatter": "denoland.vscode-deno"
   },
   "[typescript]": {
-    "editor.codeActionsOnSave": {
-      "quickfix.biome": "explicit",
-      "source.organizeImports.biome": "explicit"
-    },
-    "editor.defaultFormatter": "biomejs.biome"
+    "editor.defaultFormatter": "denoland.vscode-deno"
   },
-  "[typescriptreact]": {
-    "editor.codeActionsOnSave": {
-      "quickfix.biome": "explicit",
-      "source.organizeImports.biome": "explicit"
-    },
-    "editor.defaultFormatter": "biomejs.biome"
-  }
+  "deno.enable": true,
+  "deno.enablePaths": ["./"],
+  "deno.lint": true,
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": true
 }

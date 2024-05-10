@@ -1,0 +1,22 @@
+{
+  "fmt": {
+    "lineWidth": 95,
+    "singleQuote": true
+  },
+  "tasks": {
+    "dev": "export DENO_ENV=development && deno run --allow-net --allow-env --allow-read --watch index.ts",
+    "lint": "deno fmt && deno check **/*.ts & deno lint",
+    "start": "deno run --allow-net --allow-env --allow-read index.ts"
+  },
+  "unstable": ["kv"],
+  "compilerOptions": {
+    "allowJs": false,
+    "noImplicitAny": true,
+    "noImplicitThis": true,
+    "strict": true,
+    "strictBindCallApply": true,
+    "strictFunctionTypes": true,
+    "strictNullChecks": true,
+    "strictPropertyInitialization": true
+  }
+}
