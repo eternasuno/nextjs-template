@@ -1,20 +1,16 @@
 {
-    "customizations": {
-        "vscode": {
-            "extensions": [
-                "dbaeumer.vscode-eslint",
-                "eamodio.gitlens",
-                "rangav.vscode-thunder-client",
-                "biomejs.biome"
-            ]
-        }
-    },
-    "features": {
-        "ghcr.io/devcontainers/features/node": {
-            "nodeGypDependencies": true,
-            "version": "lts"
-        }
-    },
-    "image": "mcr.microsoft.com/devcontainers/base:debian",
-    "postStartCommand": "yarn install"
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "denoland.vscode-deno",
+        "eamodio.gitlens",
+        "rangav.vscode-thunder-client",
+        "semanticdiff.semanticdiff"
+      ]
+    }
+  },
+  "features": {
+    "ghcr.io/devcontainers-contrib/features/deno:1": {}
+  },
+  "image": "mcr.microsoft.com/devcontainers/base:debian"
 }
