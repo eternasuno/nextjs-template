@@ -30,7 +30,7 @@ export const buildXML = ({ title, author, description, link, image, items }: Fee
         <pubDate>${new Date().toUTCString()}</pubDate>
         <ttl>5</ttl>
         <itunes:author>${author}</itunes:author>
-        <itunes:summary>${description}</itunes:summary>
+        <itunes:summary><![CDATA[${description}]]></itunes:summary>
         <itunes:owner>
             <itunes:name>${author}</itunes:name>
         </itunes:owner>
@@ -59,11 +59,11 @@ const buildItem = (
     <guid isPermaLink="false">${btoa(link)}</guid>
     <pubDate>${pubDate.toUTCString()}</pubDate>
     <enclosure url="${enclosure_url}" length="0" type="${enclosure_type}"/>
-    <itunes:summary>${description}</itunes:summary>
+    <itunes:summary><![CDATA[${description}]]></itunes:summary>
     <itunes:explicit>false</itunes:explicit>
     <itunes:duration>${formateDuration(duration)}</itunes:duration>
     <itunes:image href="${image}"/>
-    <itunes:title>${title}</itunes:title>
+    <itunes:title><![CDATA[${title}]]></itunes:title>
 </item>`;
 
 const formateDuration = (duration: number) => {
