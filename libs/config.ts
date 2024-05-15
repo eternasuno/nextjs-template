@@ -8,4 +8,4 @@ export const MAX_FEED_ITEMS = 12;
 
 export const RESPONSE_TTL = 300_000;
 
-export const TOKEN = Deno.env.get('TOKEN') || 'token';
+export const TOKEN = Deno.env.get('TOKEN');
