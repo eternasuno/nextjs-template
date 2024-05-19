@@ -1,7 +1,7 @@
 import { buildXML } from '../libs/podcast.ts';
 import { DEV, MAX_FEED_ITEMS, RESPONSE_TTL, TOKEN } from '../libs/config.ts';
 import { getUserInfo, getUserVideoList, getVideoPath } from '../libs/bilibili/api.ts';
-import { Hono, MiddlewareHandler } from 'npm:hono';
+import { Hono, MiddlewareHandler } from 'https://deno.land/x/hono@v4.3.7/mod.ts';
 
 const app = new Hono();
 
