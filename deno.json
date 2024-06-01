@@ -18,5 +18,8 @@
     "strictFunctionTypes": true,
     "strictNullChecks": true,
     "strictPropertyInitialization": true
+  },
+  "imports": {
+    "hono": "jsr:@hono/hono@^4"
   }
 }

@@ -1,27 +1,11 @@
-import { buildXML } from '../libs/podcast.ts';
-import { DEV, MAX_FEED_ITEMS, RESPONSE_TTL, TOKEN } from '../libs/config.ts';
+import { Hono } from 'hono';
 import { getUserInfo, getUserVideoList, getVideoPath } from '../libs/bilibili/api.ts';
-import { Hono, MiddlewareHandler } from 'https://deno.land/x/hono@v4.3.7/mod.ts';
+import { MAX_FEED_ITEMS, TOKEN } from '../libs/config.ts';
+import { buildXML } from '../libs/podcast.ts';
 
 const app = new Hono();
 
-const cache: MiddlewareHandler = async (context, next) => {
-  const cache = await Deno.openKv();
-  const key = btoa(context.req.url);
-  const { value } = await cache.get<string>(['podcast', key]);
-  if (value !== null) {
-    return context.text(value, 200, { 'content-type': 'text/xml' });
-  }
-
-  await next();
-
-  if (!DEV && context.res.ok) {
-    const result = await context.res.clone().text();
-    await cache.set(['podcast', key], result, { expireIn: RESPONSE_TTL });
-  }
-};
-
-app.get('/users/:uid', cache, async (context) => {
+app.get('/users/:uid', async (context) => {
   const uid = context.req.param('uid');
   const keyword = context.req.query('keyword');
   const limit = Number(context.req.query('limit')) || MAX_FEED_ITEMS;

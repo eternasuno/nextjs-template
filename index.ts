@@ -1,6 +1,8 @@
 import 'https://deno.land/std@0.224.0/dotenv/load.ts';
-import { Hono, validator } from 'https://deno.land/x/hono@v4.3.7/mod.ts';
-import { logger } from 'npm:hono/logger';
+
+import { Hono } from 'hono';
+import { logger } from 'hono/logger';
+import { validator } from 'hono/validator';
 import { TOKEN } from './libs/config.ts';
 import bilibili from './routes/bilibili.ts';
 
