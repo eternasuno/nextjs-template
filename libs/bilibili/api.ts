@@ -8,7 +8,10 @@ export const getUserInfo = tryGetLong(
     const url = new URL('https://api.bilibili.com/x/space/wbi/acc/info');
     url.searchParams.append('mid', id);
 
-    const { sign, mid, face, name } = await getWithWbi<Data>(url);
+    const { sign, mid, face, name } = await getWithWbi<Data>(
+      url,
+      `https://space.bilibili.com/${id}`,
+    );
 
     return { description: sign, id: mid, image: face, name };
   },
@@ -24,7 +27,7 @@ export const getUserVideoList = async (id: string, limit: number, keyword?: stri
   url.searchParams.append('ps', String(limit));
   keyword && url.searchParams.append('keyword', keyword);
 
-  const { list: { vlist } } = await getWithWbi<Data>(url);
+  const { list: { vlist } } = await getWithWbi<Data>(url, `https://space.bilibili.com/${id}`);
 
   return Promise.all(vlist.map(({ bvid }) => getVideoInfo(bvid)));
 };

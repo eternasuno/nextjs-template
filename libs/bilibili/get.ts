@@ -11,28 +11,28 @@ const userAgents = [
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:127.0) Gecko/20100101 Firefox/127.0',
 ];
 
-export const get = retry(
-  async <T>(url: string | URL) => {
-    const response = await fetch(url, {
-      headers: {
-        'user-agent': getRandomItem(userAgents),
-        referer: 'https://www.bilibili.com',
-      },
-    });
+export const get = async <T>(url: string | URL, referer = 'https://www.bilibili.com') => {
+  const response = await fetch(url, {
+    headers: {
+      'user-agent': getRandomItem(userAgents),
+      referer,
+    },
+  });
 
-    if (!response.ok) {
-      throw new Error(response.statusText);
-    }
+  if (!response.ok) {
+    throw new Error(response.statusText);
+  }
 
-    const { code, message, data } = await response.json();
-    if (code !== 0 && code !== -101) {
-      throw new Error(message);
-    }
+  const { code, message, data } = await response.json();
+  if (code !== 0 && code !== -101) {
+    throw new Error(message);
+  }
 
-    return data as T;
-  },
+  return data as T;
+};
+
+export const getWithWbi = retry(
+  async <T>(url: URL, referer?: string) => get<T>(await sign(url), referer),
   1,
   500,
 );
-
-export const getWithWbi = async <T>(url: URL) => get<T>(await sign(url));
