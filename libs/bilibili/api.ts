@@ -1,5 +1,5 @@
 import { getWithWbi } from './get.ts';
-import { tryGetLong } from '../cache.ts';
+import { tryGetLong, tryGetShort } from '../cache.ts';
 
 export const getUserInfo = tryGetLong(
   async (id: string) => {
@@ -32,18 +32,21 @@ export const getUserVideoList = async (id: string, limit: number, keyword?: stri
   return Promise.all(vlist.map(({ bvid }) => getVideoInfo(bvid)));
 };
 
-export const getVideoPath = async (bvid: string, cid: string) => {
-  type Data = { durl: [{ url: string }] };
+export const getVideoPath = tryGetShort(
+  async (bvid: string, cid: string) => {
+    type Data = { durl: [{ url: string }] };
 
-  const url = new URL('https://api.bilibili.com/x/player/playurl');
-  url.searchParams.append('bvid', bvid);
-  url.searchParams.append('cid', cid);
-  url.searchParams.append('platform', 'html5');
+    const url = new URL('https://api.bilibili.com/x/player/playurl');
+    url.searchParams.append('bvid', bvid);
+    url.searchParams.append('cid', cid);
+    url.searchParams.append('platform', 'html5');
 
-  const { durl: [{ url: path }] } = await getWithWbi<Data>(url);
+    const { durl: [{ url: path }] } = await getWithWbi<Data>(url);
 
-  return path;
-};
+    return path;
+  },
+  'video_path',
+);
 
 const getVideoInfo = tryGetLong(
   async (id: string) => {
