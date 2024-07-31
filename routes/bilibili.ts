@@ -1,7 +1,13 @@
-import { Hono } from 'hono';
-import { getUserInfo, getUserVideoList, getVideoPath } from '../libs/bilibili/api.ts';
-import { MAX_FEED_ITEMS, TOKEN } from '../libs/config.ts';
-import { buildXML } from '../libs/podcast.ts';
+import {
+  getUserInfo,
+  getUserVideoList,
+  getVideoPath,
+} from '@/libs/bilibili/api.ts';
+import { buildXML } from '@/libs/podcast.ts';
+import { Hono } from '@hono/hono';
+
+const MAX_FEED_ITEMS = Number(Deno.env.get('MAX_FEED_ITEMS')) || 12;
+const TOKEN = Deno.env.get('TOKEN');
 
 const app = new Hono();
 
@@ -21,27 +27,23 @@ app.get('/users/:uid', async (context) => {
     author: user.name,
     description: user.description,
     image: user.image,
-    items: videoList.map((video) => {
-      const {
-        id: bvid,
-        name: title,
-        description,
-        pubDate,
-        image,
-        subVideoList: [{ id: cid, duration }],
-      } = video;
-
-      return {
-        description,
-        duration,
-        enclosure_type: 'video/mp4',
-        enclosure_url: `${domain}/bilibili/videos/${bvid}/${cid}?token=${TOKEN}`,
-        image,
-        pubDate,
-        title,
-        link: `https://www.bilibili.com/video/${bvid}`,
-      };
-    }),
+    items: videoList.map(({
+      description,
+      id: bvid,
+      image,
+      name: title,
+      pubDate,
+      subVideoList: [{ id: cid, duration }],
+    }) => ({
+      description,
+      duration,
+      enclosure_type: 'video/mp4',
+      enclosure_url: `${domain}/bilibili/videos/${bvid}/${cid}?token=${TOKEN}`,
+      image,
+      pubDate,
+      title,
+      link: `https://www.bilibili.com/video/${bvid}`,
+    })),
     title: `${keyword || '视频'} | ${user.name}`,
     link: `https://space.bilibili.com/${uid}/video`,
   });

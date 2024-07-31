@@ -1,11 +1,13 @@
-import { CACHE_LONG_TERM, CACHE_SHORT_TREM, DEV } from './config.ts';
+const CACHE_LONG_TERM = Number(Deno.env.get('CACHE_LONG_TERM')) || 43_200_000;
+const CACHE_SHORT_TREM = Number(Deno.env.get('CACHE_SHORT_TREM')) || 3_600_000;
+const STORE = Deno.env.get('DENO_ENV') !== 'development';
 
 export const tryGet = <T extends unknown[], R>(
   get: (...args: T) => R | Promise<R>,
   key: string,
   expireIn: number,
   refresh: boolean,
-  store = !DEV,
+  store = STORE,
 ) =>
 async (...args: T) => {
   const argsKey = btoa(JSON.stringify(args));

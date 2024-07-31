@@ -1,10 +1,12 @@
-import 'https://deno.land/std@0.224.0/dotenv/load.ts';
+import '@/libs/env.ts';
 
-import { Hono } from 'hono';
-import { logger } from 'hono/logger';
-import { validator } from 'hono/validator';
-import { TOKEN } from './libs/config.ts';
-import bilibili from './routes/bilibili.ts';
+import bilibili from '@/routes/bilibili.ts';
+import { Hono } from '@hono/hono';
+import { logger } from '@hono/hono/logger';
+import { validator } from '@hono/hono/validator';
+import { RetryError } from '@std/async';
+
+const TOKEN = Deno.env.get('TOKEN');
 
 const app = new Hono({ strict: false });
 
@@ -21,6 +23,11 @@ app.use(validator('query', (value, context) => {
 
 app.onError((error, context) => {
   console.warn(error);
+
+  if (error instanceof RetryError) {
+    return context.text((error.cause as Error)?.message, 500);
+  }
+
   return context.text(error.message, 500);
 });
 

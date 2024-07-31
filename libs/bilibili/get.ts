@@ -1,22 +1,19 @@
-import { getRandomItem } from '../random.ts';
-import { retry } from '../retry.ts';
-import { sign } from './wbi.ts';
+import { sign } from '@/libs/bilibili/wbi.ts';
+import { getRandomItem } from '@/libs/random.ts';
+import { retry } from '@/libs/retry.ts';
 
 const userAgents = [
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:124.0) Gecko/20100101 Firefox/124.0',
-  'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Safari/605.1.15',
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.5 Safari/605.1.15',
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:127.0) Gecko/20100101 Firefox/127.0',
 ];
 
-export const get = async <T>(url: string | URL, referer = 'https://www.bilibili.com') => {
+export const get = async (
+  url: string | URL,
+  referer = 'https://www.bilibili.com',
+) => {
   const response = await fetch(url, {
-    headers: {
-      'user-agent': getRandomItem(userAgents),
-      referer,
-    },
+    headers: { 'user-agent': getRandomItem(userAgents), referer },
   });
 
   if (!response.ok) {
@@ -28,11 +25,10 @@ export const get = async <T>(url: string | URL, referer = 'https://www.bilibili.
     throw new Error(message);
   }
 
-  return data as T;
+  return data;
 };
 
 export const getWithWbi = retry(
-  async <T>(url: URL, referer?: string) => get<T>(await sign(url), referer),
-  1,
-  500,
+  async (url: URL, referer?: string) => get(await sign(url), referer),
+  { maxAttempts: 2, maxTimeout: 500, minTimeout: 200 },
 );
