@@ -46,7 +46,7 @@ export const getVideoPath = tryGetShort(
 
     return convert<string>(data, query);
   },
-  'bilibili_video_path',
+  'video_path',
 );
 
 const getVideoInfo = tryGetLong(
@@ -57,20 +57,16 @@ const getVideoInfo = tryGetLong(
     const data = await getWithWbi(url);
     const query = `{
       id: bvid,
-      title: title,
+      name: title,
+      author: owner.name,
       description: desc,
       image: pic,
       pubDate: to_date(to_number(pubdate) * \`1000\`),
-      subVideoList: pages[*].{
-        id: cid,
-        index: page,
-        title: part,
-        duration: to_number(duration)
-      }
+      subVideoList: pages[*].{ id: cid, index: page, name: part, duration: to_number(duration) }
     }`;
 
     return convert<Video>(data, query);
   },
-  'bilibili_video',
+  'video',
   true,
 );

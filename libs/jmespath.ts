@@ -6,6 +6,8 @@ import {
   TYPE_STRING,
 } from '@jmespath-community/jmespath';
 
+type JSONValue = Parameters<typeof search>[0];
+
 registerFunction(
   'to_date',
   ([value]) =>
@@ -14,6 +16,5 @@ registerFunction(
   [{ types: [TYPE_NUMBER, TYPE_STRING, TYPE_NULL], optional: true }],
 );
 
-// deno-lint-ignore no-explicit-any
-export const convert = <T>(data: any, query: string) =>
+export const convert = <T>(data: JSONValue, query: string) =>
   search(data, query) as unknown as T;

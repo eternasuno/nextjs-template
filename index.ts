@@ -1,7 +1,6 @@
 import '@/libs/env.ts';
 
 import bilibili from '@/routes/bilibili.ts';
-import youtube from '@/routes/youtube.ts';
 import { Hono } from '@hono/hono';
 import { logger } from '@hono/hono/logger';
 import { validator } from '@hono/hono/validator';
@@ -33,6 +32,5 @@ app.onError((error, context) => {
 });
 
 app.route('/bilibili', bilibili);
-app.route('/youtube', youtube);
 
 Deno.serve(app.fetch);

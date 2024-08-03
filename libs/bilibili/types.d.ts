@@ -7,14 +7,15 @@ export type User = {
 
 export type Video = {
   id: string;
-  title: string;
+  name: string;
+  author: string;
   description: string;
   image: string;
   pubDate: Date;
   subVideoList: {
     id: string;
     index: number;
-    title: string;
+    name: string;
     duration: number;
   }[];
 };

@@ -20,7 +20,7 @@ export const buildXML = (
       <ttl>5</ttl>
       <itunes:author>${author}</itunes:author>
       <itunes:explicit>false</itunes:explicit>
-      ${items?.map((item) => buildItem(item)).join('\n')}
+      ${items.map((item) => buildItem(item)).join('\n')}
     </channel>
   </rss>`;
 
