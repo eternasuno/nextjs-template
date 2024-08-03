@@ -1,20 +1,17 @@
-export type User = {
+export type Channel = {
   id: string;
-  name: string;
+  title: string;
   description: string;
+  link: string;
   image: string;
+  videos: Video[];
 };
 
 export type Video = {
   id: string;
   title: string;
+  duration: number;
   description: string;
   image: string;
   pubDate: Date;
-  subVideoList: {
-    id: string;
-    index: number;
-    title: string;
-    duration: number;
-  }[];
 };

@@ -4,7 +4,7 @@ export type Feed = {
   description?: string;
   link: string;
   image: string;
-  items: Item[];
+  items?: Item[];
 };
 
 export type Item = {

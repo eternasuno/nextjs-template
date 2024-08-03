@@ -24,14 +24,16 @@ app.get('/users/:uid', async (context) => {
   ]);
 
   const xml = buildXML({
+    title: `${keyword || '视频'} | ${user.name}`,
     author: user.name,
     description: user.description,
     image: user.image,
+    link: `https://space.bilibili.com/${uid}/video`,
     items: videoList.map(({
       description,
       id: bvid,
       image,
-      name: title,
+      title,
       pubDate,
       subVideoList: [{ id: cid, duration }],
     }) => ({
@@ -44,8 +46,6 @@ app.get('/users/:uid', async (context) => {
       title,
       link: `https://www.bilibili.com/video/${bvid}`,
     })),
-    title: `${keyword || '视频'} | ${user.name}`,
-    link: `https://space.bilibili.com/${uid}/video`,
   });
 
   return context.text(xml, 200, { 'content-type': 'text/xml' });
