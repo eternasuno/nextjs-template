@@ -46,7 +46,7 @@ export const getVideoPath = tryGetShort(
 
     return convert<string>(data, query);
   },
-  'video_path',
+  'bilibili_video_path',
 );
 
 const getVideoInfo = tryGetLong(
@@ -67,6 +67,6 @@ const getVideoInfo = tryGetLong(
 
     return convert<Video>(data, query);
   },
-  'video',
+  'bilibili_video',
   true,
 );

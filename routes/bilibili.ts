@@ -3,7 +3,7 @@ import {
   getUserVideoList,
   getVideoPath,
 } from '@/libs/bilibili/api.ts';
-import { buildXML } from '@/libs/podcast.ts';
+import { buildXML } from '@/libs/podcast/index.ts';
 import { Hono } from '@hono/hono';
 
 const MAX_FEED_ITEMS = Number(Deno.env.get('MAX_FEED_ITEMS')) || 12;

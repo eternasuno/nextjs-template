@@ -1,5 +1,5 @@
-import { format } from '@/libs/duration.ts';
-import type { Feed, Item } from '@/libs/podcast.d.ts';
+import { format } from '@/libs/fmt/duration.ts';
+import type { Feed, Item } from '@/libs/podcast/types.d.ts';
 
 export const buildXML = (
   { title, author, description, link, image, items }: Feed,

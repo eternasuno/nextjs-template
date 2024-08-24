@@ -1,4 +1,4 @@
-import { format } from '@/libs/duration.ts';
+import { format } from '@/libs/fmt/duration.ts';
 import { assertEquals, assertIsError } from '@std/assert';
 
 Deno.test('duration format test,diration >= 0', () => {
