@@ -21,7 +21,10 @@ async (...args: T) => {
   const hit = value && value.expireAt > Date.now();
   const result = hit ? value.data : await get(...args);
 
-  if ((store && !hit) || (refresh && hit)) {
+  if (
+    (result === null || result === undefined) &&
+    ((store && !hit) || (refresh && hit))
+  ) {
     await cache.set(
       [key, argsKey],
       { data: result, expireAt: Date.now() + expireIn },
