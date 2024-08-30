@@ -1,4 +1,4 @@
-export const format = (duration: number) => {
+export const formatDuration = (duration: number) => {
   if (duration < 0) {
     throw Error('duration must be greater than 0');
   }

@@ -1,7 +1,7 @@
-import { getWithWbi } from '@/libs/bilibili/get.ts';
-import type { User, Video } from '@/libs/bilibili/types.d.ts';
-import { tryGetLong, tryGetShort } from '@/libs/cache.ts';
-import { convert } from '@/libs/jmespath.ts';
+import { getWithWbi } from '@/repositories/bilibili/get.ts';
+import type { User, Video } from '@/repositories/bilibili/types.d.ts';
+import { parseJson } from '@/utils/parser.ts';
+import { tryGetLong, tryGetMiddle } from '@/utils/try-get.ts';
 
 export const getUserInfo = tryGetLong(
   async (id: string) => {
@@ -11,9 +11,9 @@ export const getUserInfo = tryGetLong(
     const data = await getWithWbi(url, `https://space.bilibili.com/${id}`);
     const query = '{ id:mid, name:name, image:face, description:sign }';
 
-    return convert<User>(data, query);
+    return parseJson<User>(data, query);
   },
-  'bilibili_user',
+  ['bilibili', 'user'],
   true,
 );
 
@@ -29,24 +29,26 @@ export const getUserVideoList = async (
 
   const data = await getWithWbi(url, `https://space.bilibili.com/${id}`);
   const query = 'list.vlist[*].bvid';
-  const bvids = convert<string[]>(data, query);
+  const bvids = parseJson<string[]>(data, query);
 
   return Promise.all(bvids.map((bvid) => getVideoInfo(bvid)));
 };
 
-export const getVideoPath = tryGetShort(
+export const getVideoPath = tryGetMiddle(
   async (bvid: string, cid: string) => {
     const url = new URL('https://api.bilibili.com/x/player/wbi/playurl');
     url.searchParams.append('bvid', bvid);
     url.searchParams.append('cid', cid);
     url.searchParams.append('platform', 'html5');
+    console.debug(url);
 
     const data = await getWithWbi(url);
     const query = 'durl[0].url';
 
-    return convert<string>(data, query);
+    return parseJson<string>(data, query);
   },
-  'bilibili_video_path',
+  ['bilibili', 'video_path'],
+  false,
 );
 
 const getVideoInfo = tryGetLong(
@@ -56,17 +58,17 @@ const getVideoInfo = tryGetLong(
 
     const data = await getWithWbi(url);
     const query = `{
-      id: bvid,
-      name: title,
-      author: owner.name,
+      bvid: bvid,
+      cid: pages[0].cid,
+      title: title,
+      duration: to_number(pages[0].duration),
       description: desc,
       image: pic,
-      pubDate: to_date(to_number(pubdate) * \`1000\`),
-      subVideoList: pages[*].{ id: cid, index: page, name: part, duration: to_number(duration) }
+      pubDate: to_date(to_number(pubdate) * \`1000\`)
     }`;
 
-    return convert<Video>(data, query);
+    return parseJson<Video>(data, query);
   },
-  'bilibili_video',
+  ['bilibili', 'video'],
   true,
 );

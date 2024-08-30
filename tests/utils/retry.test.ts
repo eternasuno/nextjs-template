@@ -1,4 +1,4 @@
-import { retry } from '@/libs/retry.ts';
+import { retry } from '@/utils/retry.ts';
 import { assertEquals, assertIsError } from '@std/assert';
 import { RetryError } from '@std/async';
 

@@ -1,5 +1,24 @@
-import { format } from '@/libs/fmt/duration.ts';
-import type { Feed, Item } from '@/libs/podcast/types.d.ts';
+import { formatDuration } from '@/utils/formater.ts';
+
+type Feed = {
+  title: string;
+  author: string;
+  description?: string;
+  link: string;
+  image: string;
+  items: Item[];
+};
+
+type Item = {
+  title: string;
+  description?: string;
+  link: string;
+  pubDate: string;
+  enclosure_url: string;
+  enclosure_type: string;
+  duration: number;
+  image: string;
+};
 
 export const buildXML = (
   { title, author, description, link, image, items }: Feed,
@@ -29,7 +48,7 @@ const buildItem = (
     title,
     description,
     link,
-    pubDate = new Date(),
+    pubDate,
     enclosure_url,
     enclosure_type,
     duration,
@@ -41,8 +60,8 @@ const buildItem = (
     <description><![CDATA[${description}]]></description>
     <link>${link}</link>
     <guid isPermaLink="false">${btoa(link)}</guid>
-    <pubDate>${pubDate.toUTCString()}</pubDate>
+    <pubDate>${pubDate}</pubDate>
     <enclosure url="${enclosure_url}" length="0" type="${enclosure_type}"/>
-    <itunes:duration>${format(duration)}</itunes:duration>
+    <itunes:duration>${formatDuration(duration)}</itunes:duration>
     <itunes:image href="${image}"/>
   </item>`;

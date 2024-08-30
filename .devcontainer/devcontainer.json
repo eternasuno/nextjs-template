@@ -5,12 +5,14 @@
         "denoland.vscode-deno",
         "eamodio.gitlens",
         "rangav.vscode-thunder-client",
-        "semanticdiff.semanticdiff"
+        "semanticdiff.semanticdiff",
+        "ms-azuretools.vscode-docker"
       ]
     }
   },
   "features": {
-    "ghcr.io/devcontainers-contrib/features/deno:1": {}
+    "ghcr.io/devcontainers-contrib/features/deno:1": {},
+    "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
   "image": "mcr.microsoft.com/devcontainers/base:debian"
 }

@@ -1,4 +1,4 @@
-import { md5 } from '@/libs/crypto.ts';
+import { md5 } from '@/utils/crypto.ts';
 import { assertEquals } from '@std/assert';
 
 Deno.test('md5 test', () => {

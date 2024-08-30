@@ -1,6 +1,6 @@
-import { sign } from '@/libs/bilibili/wbi.ts';
-import { getRandomItem } from '@/libs/random.ts';
-import { retry } from '@/libs/retry.ts';
+import { getRandomItem } from '@/utils/random.ts';
+import { retry } from '@/utils/retry.ts';
+import { sign } from './wbi.ts';
 
 const userAgents = [
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',

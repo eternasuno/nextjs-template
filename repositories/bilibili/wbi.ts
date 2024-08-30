@@ -1,8 +1,8 @@
-import { get } from '@/libs/bilibili/get.ts';
-import { tryGetLong } from '@/libs/cache.ts';
-import { md5 } from '@/libs/crypto.ts';
-import { convert } from '@/libs/jmespath.ts';
-import { getRandomUpperCase } from '@/libs/random.ts';
+import { md5 } from '@/utils/crypto.ts';
+import { parseJson } from '@/utils/parser.ts';
+import { getRandomUpperCase } from '@/utils/random.ts';
+import { tryGetLong } from '@/utils/try-get.ts';
+import { get } from './get.ts';
 
 // deno-fmt-ignore
 const mixinKeyEncTab = [
@@ -36,11 +36,12 @@ export const sign = async (url: URL | string) => {
 const getSalt = tryGetLong(
   async () => {
     const data = await get('https://api.bilibili.com/x/web-interface/nav');
-    const originalSalt = convert<string[]>(data, 'wbi_img.*')
+    const originalSalt = parseJson<string[]>(data, 'wbi_img.*')
       .map((str) => str.split(/\.|\//).at(-2))
       .join('');
 
     return mixinKeyEncTab.map((index) => originalSalt.charAt(index)).join('');
   },
-  'salt',
+  ['bilibili', 'salt'],
+  false,
 );
