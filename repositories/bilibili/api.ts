@@ -39,10 +39,10 @@ export const getVideoPath = tryGetMiddle(
     const url = new URL('https://api.bilibili.com/x/player/wbi/playurl');
     url.searchParams.append('bvid', bvid);
     url.searchParams.append('cid', cid);
-    url.searchParams.append('fnval', '16');
+    url.searchParams.append('platform', 'html5');
 
     const data = await getWithWbi(url);
-    const query = 'sort_by(dash.audio, &bandwidth)[0].baseUrl';
+    const query = 'durl[0].url';
 
     return parseJson<string>(data, query);
   },
