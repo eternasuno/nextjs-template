@@ -24,11 +24,11 @@ export const getUserVideoList = async (
 ) => {
   const url = new URL('https://api.bilibili.com/x/space/wbi/arc/search');
   url.searchParams.append('mid', id);
-  url.searchParams.append('ps', String(limit));
+  url.searchParams.append('ps', String(limit * 2));
   keyword && url.searchParams.append('keyword', keyword);
 
   const data = await getWithWbi(url, `https://space.bilibili.com/${id}`);
-  const query = 'list.vlist[*].bvid';
+  const query = `list.vlist[?!is_charging_arc]|[0:${limit}].bvid`;
   const bvids = parseJson<string[]>(data, query);
 
   return Promise.all(bvids.map((bvid) => getVideoInfo(bvid)));
@@ -39,11 +39,10 @@ export const getVideoPath = tryGetMiddle(
     const url = new URL('https://api.bilibili.com/x/player/wbi/playurl');
     url.searchParams.append('bvid', bvid);
     url.searchParams.append('cid', cid);
-    url.searchParams.append('platform', 'html5');
-    console.debug(url);
+    url.searchParams.append('fnval', '16');
 
     const data = await getWithWbi(url);
-    const query = 'durl[0].url';
+    const query = 'sort_by(dash.audio, &bandwidth)[0].baseUrl';
 
     return parseJson<string>(data, query);
   },

@@ -28,11 +28,11 @@ jobs:
         run: deno task lint
 
       - name: Run tests
-        run: deno test -A
+        run: deno task test
 
       - name: Upload to Deno Deploy
         uses: denoland/deployctl@v1
         with:
           project: "podcast-eternasuno"
-          entrypoint: "index.ts"
+          entrypoint: "main.ts"
           root: "."

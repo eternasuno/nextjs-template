@@ -22,9 +22,10 @@
     "@std/dotenv": "jsr:@std/dotenv@^0.225.0"
   },
   "tasks": {
-    "dev": "export DENO_ENV=development && deno run --allow-net --allow-env --allow-read --watch main.ts",
+    "dev": "export DENO_ENV=development && deno run -A --watch main.ts",
     "lint": "deno fmt && deno check **/*.ts & deno lint",
-    "start": "deno run --allow-net --allow-env --allow-read main.ts"
+    "start": "deno run -A main.ts",
+    "test": "deno test -A"
   },
   "unstable": [
     "kv"
