@@ -20,7 +20,7 @@ export const buildUserPodcast = tryGetShort(
       image: user.image,
       items: videoList.map((video) => ({
         ...video,
-        enclosure_type: 'audio/mpeg',
+        enclosure_type: 'video/mp4',
         enclosure_url:
           `${BASE_PATH}/bilibili/audios/${video.bvid}/${video.cid}?token=${TOKEN}`,
         link: `https://www.bilibili.com/video/${video.bvid}`,
