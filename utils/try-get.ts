@@ -4,6 +4,7 @@ import {
   CACHE_MIDDLE_TERM,
   CACHE_SHORT_TREM,
 } from '@/config.ts';
+import { md5 } from '@/utils/crypto.ts';
 
 export const tryGet = <T extends unknown[], R>(
   get: (...args: T) => R | Promise<R>,
@@ -14,7 +15,7 @@ export const tryGet = <T extends unknown[], R>(
 ) =>
 async (...args: T) => {
   using kv = await Deno.openKv();
-  const argsKey = btoa(JSON.stringify(args));
+  const argsKey = md5(JSON.stringify(args));
   const cacheKey = [...key, argsKey];
   const { value } = await kv.get<{ data: R; expireAt: number }>(cacheKey);
   const hit = value !== null && value !== undefined &&
