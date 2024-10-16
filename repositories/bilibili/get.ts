@@ -1,6 +1,7 @@
+import { WithWbi } from '@/repositories/bilibili/wbi.ts';
+import { withWebId } from '@/repositories/bilibili/web_id.ts';
 import { getRandomItem } from '@/utils/random.ts';
 import { retry } from '@/utils/retry.ts';
-import { sign } from './wbi.ts';
 
 const userAgents = [
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/123.0.0.0 Safari/537.36',
@@ -27,7 +28,8 @@ export const get = async (
   return data;
 };
 
-export const getWithWbi = retry(
-  async (url: URL, referer?: string) => get(await sign(url), referer),
+export const getWithSign = retry(
+  async (url: URL, referer?: string) =>
+    get(await WithWbi(await withWebId(url)), referer),
   { maxAttempts: 2, maxTimeout: 500, minTimeout: 200 },
 );

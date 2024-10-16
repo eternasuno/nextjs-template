@@ -10,7 +10,7 @@ const mixinKeyEncTab = [
   27, 43, 5, 49, 33, 9, 42, 19, 29, 28, 14, 39, 12, 38, 41, 13,
 ];
 
-export const sign = async (url: URL | string) => {
+export const WithWbi = async (url: URL | string) => {
   const signedURL = new URL(url);
 
   signedURL.searchParams.append('dm_img_list', '[]');

@@ -1,4 +1,4 @@
-import { getWithWbi } from '@/repositories/bilibili/get.ts';
+import { getWithSign } from '@/repositories/bilibili/get.ts';
 import type { User, Video } from '@/repositories/bilibili/types.d.ts';
 import { parseJson } from '@/utils/parser.ts';
 import { tryGetLong, tryGetMiddle } from '@/utils/try-get.ts';
@@ -8,7 +8,7 @@ export const getUserInfo = tryGetLong(
     const url = new URL('https://api.bilibili.com/x/space/wbi/acc/info');
     url.searchParams.append('mid', id);
 
-    const data = await getWithWbi(url, `https://space.bilibili.com/${id}`);
+    const data = await getWithSign(url, `https://space.bilibili.com/${id}`);
     const query = '{ id:mid, name:name, image:face, description:sign }';
 
     return parseJson<User>(data, query);
@@ -27,7 +27,7 @@ export const getUserVideoList = async (
   url.searchParams.append('ps', String(limit * 2));
   keyword && url.searchParams.append('keyword', keyword);
 
-  const data = await getWithWbi(url, `https://space.bilibili.com/${id}`);
+  const data = await getWithSign(url, `https://space.bilibili.com/${id}`);
   const query = `list.vlist[?!is_charging_arc]|[0:${limit}].bvid`;
   const bvids = parseJson<string[]>(data, query);
 
@@ -41,7 +41,7 @@ export const getVideoPath = tryGetMiddle(
     url.searchParams.append('cid', cid);
     url.searchParams.append('platform', 'html5');
 
-    const data = await getWithWbi(url);
+    const data = await getWithSign(url);
     const query = 'durl[0].url';
 
     return parseJson<string>(data, query);
@@ -55,7 +55,7 @@ const getVideoInfo = tryGetLong(
     const url = new URL('https://api.bilibili.com/x/web-interface/wbi/view');
     url.searchParams.append('bvid', id);
 
-    const data = await getWithWbi(url);
+    const data = await getWithSign(url);
     const query = `{
       bvid: bvid,
       cid: pages[0].cid,
