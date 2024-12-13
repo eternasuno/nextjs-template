@@ -1,14 +1,14 @@
-import { getWithSign } from '@/repositories/bilibili/get.ts';
+import { get } from '@/repositories/bilibili/get.ts';
 import type { User, Video } from '@/repositories/bilibili/types.d.ts';
 import { parseJson } from '@/utils/parser.ts';
-import { tryGetLong, tryGetMiddle } from '@/utils/try-get.ts';
+import { tryGetLong } from '@/utils/try-get.ts';
 
 export const getUserInfo = tryGetLong(
   async (id: string) => {
     const url = new URL('https://api.bilibili.com/x/space/wbi/acc/info');
     url.searchParams.append('mid', id);
 
-    const data = await getWithSign(url, `https://space.bilibili.com/${id}`);
+    const data = await get(url, `https://space.bilibili.com/${id}`);
     const query = '{ id:mid, name:name, image:face, description:sign }';
 
     return parseJson<User>(data, query);
@@ -27,35 +27,31 @@ export const getUserVideoList = async (
   url.searchParams.append('ps', String(limit * 2));
   keyword && url.searchParams.append('keyword', keyword);
 
-  const data = await getWithSign(url, `https://space.bilibili.com/${id}`);
+  const data = await get(url, `https://space.bilibili.com/${id}`);
   const query = `list.vlist[?!is_charging_arc]|[0:${limit}].bvid`;
   const bvids = parseJson<string[]>(data, query);
 
   return Promise.all(bvids.map((bvid) => getVideoInfo(bvid)));
 };
 
-export const getVideoPath = tryGetMiddle(
-  async (bvid: string, cid: string) => {
-    const url = new URL('https://api.bilibili.com/x/player/wbi/playurl');
-    url.searchParams.append('bvid', bvid);
-    url.searchParams.append('cid', cid);
-    url.searchParams.append('platform', 'html5');
+export const getVideoPath = async (bvid: string, cid: string) => {
+  const url = new URL('https://api.bilibili.com/x/player/wbi/playurl');
+  url.searchParams.append('bvid', bvid);
+  url.searchParams.append('cid', cid);
+  url.searchParams.append('platform', 'html5');
 
-    const data = await getWithSign(url);
-    const query = 'durl[0].url';
+  const data = await get(url);
+  const query = 'durl[0].url';
 
-    return parseJson<string>(data, query);
-  },
-  ['bilibili', 'video_path'],
-  false,
-);
+  return parseJson<string>(data, query);
+};
 
 const getVideoInfo = tryGetLong(
   async (id: string) => {
     const url = new URL('https://api.bilibili.com/x/web-interface/wbi/view');
     url.searchParams.append('bvid', id);
 
-    const data = await getWithSign(url);
+    const data = await get(url);
     const query = `{
       bvid: bvid,
       cid: pages[0].cid,
