@@ -2,17 +2,17 @@
   "customizations": {
     "vscode": {
       "extensions": [
-        "denoland.vscode-deno",
         "eamodio.gitlens",
-        "rangav.vscode-thunder-client",
-        "semanticdiff.semanticdiff",
-        "ms-azuretools.vscode-docker"
+        "nwolverson.ide-purescript"
       ]
     }
   },
   "features": {
-    "ghcr.io/devcontainers-contrib/features/deno-asdf:2": {},
+    "ghcr.io/devcontainers-extra/features/webi-packages:1": {
+      "packages": "node"
+    },
     "ghcr.io/devcontainers/features/docker-in-docker:2": {}
   },
-  "image": "mcr.microsoft.com/devcontainers/base:debian"
+  "image": "mcr.microsoft.com/devcontainers/base:debian",
+  "postCreateCommand": "npm install"
 }

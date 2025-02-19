@@ -128,4 +128,22 @@ dist
 .yarn/install-state.gz
 .pnp.*
 
-deno.lock
+package-lock.json
+
+# purescript
+.psa*
+.psc-ide-port
+.psc-package/
+.psc*
+.pulp-cache/
+.purs*
+.spago
+.spec-results
+bower_components/
+generated-docs/
+output-es/
+output/
+spago.lock
+
+# output file
+index.mjs

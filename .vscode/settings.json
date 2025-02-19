@@ -1,17 +1,22 @@
 {
-  "[json]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
+  "[javascript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features",
+    "editor.formatOnSaveMode": "modificationsIfAvailable"
   },
-  "[jsonc]": {
-    "editor.defaultFormatter": "denoland.vscode-deno"
-  },
-  "[typescript]": {
-    "editor.codeActionsOnSave": { "source.organizeImports": "explicit" },
-    "editor.defaultFormatter": "denoland.vscode-deno"
-  },
-  "deno.enable": true,
-  "deno.enablePaths": ["./"],
-  "deno.lint": true,
   "editor.formatOnPaste": true,
-  "editor.formatOnSave": true
+  "editor.formatOnSave": true,
+  "files.watcherExclude": {
+    "**/.git/objects/**": true,
+    "**/.git/subtree-cache/**": true,
+    "**/.hg/store/**": true,
+    "**/.spago/**": true
+  },
+  "purescript.addNpmPath": true,
+  "purescript.addPscPackageSources": true,
+  "search.exclude": {
+    "**/*.code-search": true,
+    "**/.spago/**": true,
+    "**/bower_components": true,
+    "**/node_modules": true
+  }
 }

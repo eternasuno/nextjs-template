@@ -1,0 +1,21 @@
+package:
+  name: purescript
+  dependencies:
+    - argonaut
+    - console
+    - effect
+    - fetch
+    - fetch-argonaut
+    - http-methods
+    - js-uri
+    - prelude
+  test:
+    main: Test.Main
+    dependencies:
+      - quickcheck
+      - spec
+      - spec-discovery
+      - spec-quickcheck
+workspace:
+  packageSet:
+    registry: 63.0.1
